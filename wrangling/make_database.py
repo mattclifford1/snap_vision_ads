@@ -5,12 +5,8 @@ from argparse import ArgumentParser
 
 
 def get_all_subdirs(dir):
-    all_paths = glob.glob(dir + '/**', recursive=True)
-    # keep only files
-    dirs = []
-    for path in all_paths:
-        if os.path.isdir(path):
-            dirs.append(path)
+    dirs = glob.glob(dir + '/**/', recursive=True)
+    dirs.pop(0)  # remove first one with is the base dir
     return dirs
 
 def contruct_database(dirs):
@@ -19,20 +15,18 @@ def contruct_database(dirs):
     for dir in dirs:
         # get all image paths
         images = []
-        for image in os.listdir(dir):
-            images.append(os.path.join(dir, image))
+        for image_file in os.listdir(dir):
+            images.append(os.path.join(dir, image_file))
         # add images with their similar images from the dir
-        print(images)
-        for image in images:
-            print(image)
-            all_images.append(image)
-            # similar.append(set(images) - set(image))
-        print(' ')
-
+        for image_path in images:
+            all_images.append(image_path)
+            similar.append(list(set(images) - set(image_path)))
+        # print(' ')
+    # print(all_images)
     df = pd.DataFrame(data={'image_path': all_images,
                             'similar_images': similar})
-    print(df.head())
-    # df.to_csv('./data/image_paths.csv')
+    # print(df.head())
+    df.to_csv('.image_paths.csv')
 
 
 
