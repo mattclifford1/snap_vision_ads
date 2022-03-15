@@ -2,6 +2,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage.transform import resize
 
 # storing the dataset path
 clothing_fashion_mnist = tf.keras.datasets.fashion_mnist
@@ -83,6 +84,11 @@ prediction_model = tf.keras.Sequential(
  
 # feeding the testing data to the probability
 # prediction model
+
+# %% Define test set from uob image set
+
+
+
 prediction = prediction_model.predict(x_test)
  
 # predicted class label
