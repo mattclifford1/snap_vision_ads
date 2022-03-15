@@ -3,7 +3,11 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.transform import resize
+from skimage import io
+from skimage.color import rgb2gray
+from tqdm import tqdm
 
+# %%
 # storing the dataset path
 clothing_fashion_mnist = tf.keras.datasets.fashion_mnist
  
@@ -87,10 +91,32 @@ prediction_model = tf.keras.Sequential(
 
 # %% Define test set from uob image set
 
+# load image filenames
+from wrangling.explore_dataset import get_all_files
+filenames = get_all_files('data/uob_image_set')
 
+x_uob_test = []
+for f in tqdm(filenames[0:100]):
+    image = io.imread(f)
+    x_uob_test.append(rgb2gray(resize(image, (28,28),
+                       anti_aliasing=True)))       
 
-prediction = prediction_model.predict(x_test)
- 
+# %% NORMALISE
+# x_uob_test = x_uob_test / 255.0  # normalizing the testing data
+
+# %%
+
+prediction = prediction_model.predict(np.array(x_uob_test))
+predicted_labels = []
+for p in prediction:
+    predicted_labels.append(label_class_names[np.argmax(p)])
+
+for i in range(0,len(prediction)):
+    print(predicted_labels[i])
+    io.imshow(filenames[i])
+    io.show()
+
+# %% 
 # predicted class label
 print('Predicted test label:', np.argmax(prediction[0]))
  
