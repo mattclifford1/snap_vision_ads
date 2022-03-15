@@ -7,3 +7,11 @@ $ conda activate snap_vision
 ```
 $ pip install -r requirements.txt
 ```
+# Install pytorch CPU only
+```
+$ conda install pytorch torchvision torchaudio cpuonly -c pytorch
+```
+# Or install on GPU (if you have nvidia GPU)
+```
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+```
