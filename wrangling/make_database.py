@@ -26,7 +26,7 @@ def contruct_database(dirs):
     df = pd.DataFrame(data={'image_path': all_images,
                             'similar_images': similar})
     # print(df.head())
-    df.to_csv('.image_paths.csv')
+    df.to_csv('image_paths.csv', index=False)
 
 
 
