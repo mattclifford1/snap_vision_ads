@@ -6,28 +6,17 @@ from skimage import io
 from skimage.color import rgb2gray
 from tqdm import tqdm
 import os
+from scipy import stats
 
 def get_features(filename):
 
-    # DELETE AFTER TEST
-    set_ID = '11059585'
-    photo_ID = '0'
+    image = io.imread(filename)
+    mean = np.mean(image)
+    mode = stats.mode(image)
 
-    conc_ID = set_ID + '/' + set_ID + '_' + photo_ID + '.jpg'
+    im_stats = {'mean':mean,
+                'mode':mode,
+                }
 
-    path = 'data/uob_image_set/'
-
-    filepath = os.path.join(path,conc_ID)
-    #DELETE AFTER TEST ^^
-
-
-    image = io.imread(filepath)
-
-
-    io.imshow(image)
-    io.show()
-    mean = 0
-    mode = 0
-
-    return mean,mode
+    return im_stats
 # %%
