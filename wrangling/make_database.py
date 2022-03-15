@@ -29,7 +29,6 @@ def contruct_database(dirs):
     df.to_csv('image_paths.csv', index=False)
 
 
-
 if __name__ == '__main__':
     # set up command line arguments to specifiy where the dataset is
     parser = ArgumentParser()
