@@ -3,4 +3,6 @@ matplotlib
 pandas
 scikit-learn
 scikit-image
+scipy
 tqdm
+
