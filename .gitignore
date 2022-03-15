@@ -1,3 +1,10 @@
+# things to ignore .
+./datasets
+uob_image_set
+datasets/uob_image_set
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
