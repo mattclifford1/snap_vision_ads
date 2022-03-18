@@ -1,9 +1,7 @@
 # things to ignore .
 ./datasets
-data
-./data/*
 uob_image_set
-datasets/uob_image_set
+data/uob_image_set
 
 
 

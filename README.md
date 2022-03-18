@@ -1,17 +1,21 @@
-# Set up python env with conda
+# Snap Vision Data Pipeline
+The (miro board)[https://miro.com/app/board/uXjVOGzD1U0=/] contains a visual representation of the pipeline and ideas/ ongoing work
+
+# Python Setup
+## env with conda
 ```
 $ conda create -n snap_vision python=3.8
 $ conda activate snap_vision
 ```
-# Install requirements
+## Install requirements
 ```
 $ pip install -r requirements.txt
 ```
-# Install pytorch CPU only
+## Install pytorch CPU only
 ```
 $ conda install pytorch torchvision torchaudio cpuonly -c pytorch
 ```
-# Or install on GPU (if you have nvidia GPU)
+## Or install on GPU (if you have nvidia GPU)
 ```
 conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 ```
