@@ -2,9 +2,9 @@
 ./datasets
 uob_image_set
 data/uob_image_set
+data/files_to_gitignore/*
 
-
-
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
