@@ -15,7 +15,7 @@ else:
     extraction_path = 'data'
 
 # unzip
-print('\nUnzipping data to: ', extraction_path)
+print('\nUnzipping into directory: ', extraction_path)
 zip_file = 'uob_image_set.zip'
 with zipfile.ZipFile(zip_file, 'r') as zip_ref:
     zip_ref.extractall(extraction_path)
@@ -27,3 +27,5 @@ os.remove(zip_file)
 DS_file = os.path.join(extraction_path, '.DS_Store')
 if os.path.isfile(DS_file):
     os.remove(DS_file)
+
+print('finished')
