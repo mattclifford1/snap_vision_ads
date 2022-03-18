@@ -20,3 +20,12 @@ def get_features(filename):
 
     return im_stats
 # %%
+
+if __name__ == '__main__':
+    # get data loader
+    import sys
+    sys.path.append('..')
+    from data_loader.load import get_database
+    data = get_database()
+    # test get_features
+    print(get_features(data[0]['image']))
