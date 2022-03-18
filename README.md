@@ -1,5 +1,5 @@
 # Snap Vision Data Pipeline
-The (miro board)[https://miro.com/app/board/uXjVOGzD1U0=/] contains a visual representation of the pipeline and ideas/ ongoing work
+The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
 
 # Python Setup
 ## env with conda
