@@ -1,12 +1,12 @@
 # things to ignore .
 ./datasets
-data
-./data/*
 uob_image_set
-datasets/uob_image_set
+*/uob_image_set
+data/uob_image_set
+data/files_to_gitignore/*
+!data/files_to_gitignore/readme.md
 
-
-
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
