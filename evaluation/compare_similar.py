@@ -5,10 +5,10 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 class eval:
-    def __init__(self, embeddings, labels, neighbours=3):
+    def __init__(self, embeddings, labels, num_neighbours=3):
         self.embeddings = embeddings   # list
         self.labels = labels           # list
-        self.neighbours = neighbours
+        self.num_neighbours = num_neighbours
         self.compute()
 
     def compute(self):
@@ -19,17 +19,16 @@ class eval:
             x_test = X_train.pop(i)
             y_test = y_train.pop(i)
             y_pred = self.get_knn_class(X_train, y_train, [x_test])
-            print(y_pred)
-            print(y_test)
             if y_pred[0] == y_test:
                 scores.append(1)
             else:
                 scores.append(0)
-        print('Accuracy: ', (sum(scores)/len(scores))*100, '%')
+        self.accuracy = (sum(scores)/len(scores))
+        print('Accuracy: ', self.accuracy*100, '%')
 
 
     def get_knn_class(self, X_train, y_train, x_test):
-        neigh = KNeighborsClassifier(self.neighbours)
+        neigh = KNeighborsClassifier(self.num_neighbours)
         neigh.fit(X_train, y_train)
         return neigh.predict(x_test)
 
