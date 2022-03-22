@@ -17,7 +17,7 @@ def get_all_subdirs(dir):
     dirs.pop(0)  # remove first one with is the base dir
     return dirs
 
-def contruct_database(dir):
+def contruct_database(dir='data/uob_image_set'):
     all_subdirs = get_all_subdirs(dir)
     all_images = []
     similar = []
