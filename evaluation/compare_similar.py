@@ -31,7 +31,7 @@ class eval:
 
     def run_parellel(self):
         pool_obj = multiprocessing.Pool()
-        scores = pool_obj.map(self.get_score,range(len(self.labels)))
+        scores = list(tqdm(pool_obj.imap(self.get_score, range(len(self.labels))), total=len(self.labels)))
         return scores
 
     def get_score(self, i):

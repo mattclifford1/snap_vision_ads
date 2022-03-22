@@ -1,24 +1,45 @@
+from argparse import ArgumentParser
+import sys
+import multiprocessing
 import pandas as pd
 import numpy as np
-from argparse import ArgumentParser
 from tqdm import tqdm
-import sys
 sys.path.append('..')
 sys.path.append('.')
 from exploration.features import get_features
 from data_loader.load import get_database
 
 
-def save_simple_features(csv_file='wrangling/image_paths.csv'):
-    data = get_database()
-    features = []
-    for row in tqdm(data):
-        image_path = row['image_path']
-        features_dict = get_features(image_path)
-        features.append(features_dict)
+class save_simple_features:
+    def __init__(self, csv_file='wrangling/image_paths.csv', compute_sequencially=False):
+        print('Making simple features')
+        self.data = get_database()
+        self.im_paths = []
+        for row in self.data:
+            self.im_paths.append(row['image_path'])
 
-    data.add_col(features, 'features')
-    data.save_df('exploration/database.csv')
+        if compute_sequencially:
+            features = self.run_sequentially()
+        else:
+            features = self.run_parellel()
+
+        self.data.add_col(features, 'features')
+        self.data.save_df('exploration/database.csv')
+
+    def get_feats_func(self, i): # wrapper for multiprocessing func
+        return get_features(self.im_paths[i])
+
+    def run_sequentially(self):
+        features = []
+        for i in tqdm(range(len(self.im_paths))):
+            features_dict = self.get_feats_func(i)
+            features.append(features_dict)
+        return features
+
+    def run_parellel(self):
+        pool_obj = multiprocessing.Pool()
+        features = list(tqdm(pool_obj.imap(self.get_feats_func, range(len(self.im_paths))), total=len(self.im_paths)))
+        return features
 
 
 if __name__ == '__main__':
