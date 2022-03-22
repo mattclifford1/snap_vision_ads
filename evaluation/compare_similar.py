@@ -2,6 +2,7 @@
 compare to nearest embeddings and see if they are of the same class
 '''
 from sklearn.neighbors import KNeighborsClassifier
+from tqdm import tqdm
 
 
 class eval:
@@ -13,7 +14,8 @@ class eval:
 
     def compute(self):
         scores = []
-        for i in range(len(labels)):
+        print('Running evaluation')
+        for i in tqdm(range(len(self.labels))):
             X_train = list(self.embeddings) # copy
             y_train = list(self.labels) # copy
             x_test = X_train.pop(i)
@@ -25,7 +27,6 @@ class eval:
                 scores.append(0)
         self.accuracy = (sum(scores)/len(scores))
         print('Accuracy: ', self.accuracy*100, '%')
-
 
     def get_knn_class(self, X_train, y_train, x_test):
         neigh = KNeighborsClassifier(self.num_neighbours)

@@ -10,7 +10,12 @@ class get_database:
 
     def check_csv_exists(self):
         if not os.path.exists(self.df_csv):
-            raise FileNotFoundError('No database file found: '+self.df_csv)
+            # raise FileNotFoundError('No database file found: '+self.df_csv)
+            # create database instead
+            import sys
+            sys.path.append('.')
+            from wrangling import database_creator
+            database_creator.contruct_database()
 
     def load_df(self):
         self.df = pd.read_csv(self.df_csv)

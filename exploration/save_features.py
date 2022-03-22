@@ -9,7 +9,7 @@ from exploration.features import get_features
 from data_loader.load import get_database
 
 
-def get_all_features(csv_file):
+def save_simple_features(csv_file='wrangling/image_paths.csv'):
     data = get_database()
     features = []
     for row in tqdm(data):
@@ -24,7 +24,7 @@ def get_all_features(csv_file):
 if __name__ == '__main__':
     # set up command line arguments to specifiy where the dataset is
     parser = ArgumentParser()
-    parser.add_argument("--csv_file", default='image_paths.csv')
+    parser.add_argument("--csv_file", default='wrangling/image_paths.csv')
     ARGS = parser.parse_args()
-
-    get_all_features(ARGS.csv_file)
+    # calculate and save all features
+    save_simple_features(ARGS.csv_file)
