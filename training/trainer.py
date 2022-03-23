@@ -38,7 +38,7 @@ def run(model, optimiser, criterion, dataloader, device):
     evaluation = []
     for epoch in tqdm(range(epochs), desc="Epochs"):
         running_loss = []
-        for step, sample in enumerate(tqdm(dataloader, desc="Training", leave=False)):
+        for step, sample in enumerate(tqdm(dataloader, desc="Steps", leave=False)):
             anchor_img = sample['image'].to(device=device, dtype=torch.float)
             positive_img = sample['positive'].to(device=device, dtype=torch.float)
             negative_img = sample['negative'].to(device=device, dtype=torch.float)
@@ -55,11 +55,10 @@ def run(model, optimiser, criterion, dataloader, device):
             running_loss.append(loss.cpu().detach().numpy())
             # if step%10 == 0:
             #     print("Step Loss: {:.4f}".format(loss.cpu().detach().numpy()))
-        if epoch%5 == 0:
+        if (epoch)%5 == 0:
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
             torch.save(model.state_dict(), 'data/files_to_gitignore/trained_simple_model'+str(epoch)+'.pth')
-            evalled = eval_torch_model(model, input_size)
-            evaluation.append(evalled.accuracy*100)
+            evaluation.append(eval_torch_model(model, input_size))
     print(evaluation)
     return model
 

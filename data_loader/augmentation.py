@@ -9,7 +9,7 @@ import torch
 from torchvision import transforms
 from skimage import transform
 
-class Rescale(object):
+class Rescale(object): # and read
     """Rescale the image in a sample to a given size.
 
     Args:
@@ -19,12 +19,12 @@ class Rescale(object):
     def __init__(self, output_size):
         assert isinstance(output_size, tuple)
         self.output_size = output_size
+        new_h, new_w = self.output_size
+        self.new_h, self.new_w = int(new_h), int(new_w)
 
     def __call__(self, sample):
-        new_h, new_w = self.output_size
-        new_h, new_w = int(new_h), int(new_w)
         for key in sample.keys():
-            sample[key] = transform.resize(sample[key], (new_h, new_w))
+            sample[key] = transform.resize(sample[key], (self.new_h, self.new_w))
         return sample
 
 

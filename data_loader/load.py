@@ -73,7 +73,7 @@ class get_data:
         random_similar = random.choice(self.similar_images[i])
         not_similars = list(set(self.image_paths) - set(self.similar_images[i]))
         random_not_similar = random.choice(not_similars)
-        # read images from disk
+        # get images from file
         image_path = io.imread(image_path)
         sample = {'image': image_path}
         if not self.eval:

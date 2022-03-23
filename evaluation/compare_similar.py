@@ -84,7 +84,8 @@ def eval_torch_model(model, input_size=512, device='cuda', csv='wrangling/image_
         # if count >10:
         #     break
         count +=1
-    eval(embeddings, labels, compute_sequencially=True)
+    evaller = eval(embeddings, labels, compute_sequencially=True)
+    return evaller.accuracy*100
 
 
 if __name__ == '__main__':
