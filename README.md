@@ -1,6 +1,12 @@
 # Snap Vision Data Pipeline
 The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
 
+### Uselink links
+ - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
+ - [Kaggle triplet loss](https://www.kaggle.com/code/hirotaka0122/triplet-loss-with-pytorch/notebook)
+ - [pytorch dataloader](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+
+
 # Downloading the dataset
 Follow the instructions inside [data](./data) to download and unzip the dataset automatically using python.
 
