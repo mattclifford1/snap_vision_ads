@@ -16,19 +16,16 @@ class Rescale(object):
         output_size (tuple): Desired output size. Output is
             matched to output_size.
     """
-
     def __init__(self, output_size):
         assert isinstance(output_size, tuple)
         self.output_size = output_size
 
     def __call__(self, sample):
-        image, positive, negative = sample['image'], sample['positive'], sample['negative']
         new_h, new_w = self.output_size
         new_h, new_w = int(new_h), int(new_w)
-        img = transform.resize(image, (new_h, new_w))
-        pos = transform.resize(positive, (new_h, new_w))
-        neg = transform.resize(negative, (new_h, new_w))
-        return {'image': img, 'positive': pos, 'negative': neg}
+        for key in sample.keys():
+            sample[key] = transform.resize(sample[key], (new_h, new_w))
+        return sample
 
 
 class RandomCrop(object):
@@ -48,11 +45,9 @@ class RandomCrop(object):
             self.output_size = output_size
 
     def __call__(self, sample):
-        image, positive, negative = sample['image'], sample['positive'], sample['negative']
-        image = self.crop(image)
-        positive = self.crop(positive)
-        negative = self.crop(negative)
-        return {'image': image, 'positive': positive, 'negative': negative}
+        for key in sample.keys():
+            sample[key] = self.crop(sample[key])
+        return sample
 
     def crop(self, image):
         h, w = image.shape[:2]
@@ -66,18 +61,16 @@ class RandomCrop(object):
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
-
     def __call__(self, sample):
-        image, positive, negative = sample['image'], sample['positive'], sample['negative']
         # swap color axis because
         # numpy image: H x W x C
         # torch image: C x H x W
-        image = image.transpose((2, 0, 1))
-        positive = positive.transpose((2, 0, 1))
-        negative = image.transpose((2, 0, 1))
-        return {'image': torch.from_numpy(image),
-                'positive': torch.from_numpy(positive),
-                'negative': torch.from_numpy(negative)}
+        for key in sample.keys():
+            sample[key] = self.to_tensor(sample[key])
+        return sample
+
+    def to_tensor(self, image):
+        return torch.from_numpy(image.transpose((2, 0, 1)))
 
 
 if __name__ == '__main__':
@@ -85,8 +78,8 @@ if __name__ == '__main__':
     import sys
     sys.path.append('.')
     sys.path.append('..')
-    from data_loader.load import get_training_data
-    training_data = get_training_data()
+    from data_loader.load import get_data
+    training_data = get_data()
 
     scale = Rescale((256,256))
     crop = RandomCrop(128)

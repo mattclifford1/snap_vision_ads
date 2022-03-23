@@ -46,12 +46,14 @@ class get_database:
 '''
 to be used with torch's dataloader when training with triplet loss
 '''
-class get_training_data:
+class get_data:
     def __init__(self,
                  df_csv='wrangling/image_paths.csv',
-                 transform=None):
+                 transform=None,
+                 eval=False):
         self.df_csv = df_csv
         self.transform = transform
+        self.eval = eval
         self.df = pd.read_csv(self.df_csv)
         self.image_paths = self.df['image_path'].tolist()
         self.similar_images = self.df['similar_images'].tolist()
@@ -73,12 +75,12 @@ class get_training_data:
         random_not_similar = random.choice(not_similars)
         # read images from disk
         image_path = io.imread(image_path)
-        random_similar = io.imread(random_similar)
-        random_not_similar = io.imread(random_not_similar)
-        # make into sample
-        sample = {'image':    image_path,
-                  'positive': random_similar,
-                  'negative': random_not_similar}
+        sample = {'image': image_path}
+        if not self.eval:
+            random_similar = io.imread(random_similar)
+            random_not_similar = io.imread(random_not_similar)
+            sample['positive'] = random_similar
+            sample['negative'] = random_not_similar
         # data transforms
         if self.transform:
             sample = self.transform(sample)
@@ -91,7 +93,7 @@ if __name__ == '__main__':
 
     # plot a few of the training examples
     import matplotlib.pyplot as plt
-    training_data = get_training_data()
+    training_data = get_data()
     fig = plt.figure()
 
     for i in range(len(training_data)):

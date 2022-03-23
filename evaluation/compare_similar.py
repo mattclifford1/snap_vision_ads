@@ -8,7 +8,7 @@ from tqdm import tqdm
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from data_loader.load import get_training_data
+from data_loader.load import get_data
 from data_loader.augmentation import *
 
 
@@ -21,7 +21,6 @@ class eval:
         self.compute()
 
     def compute(self):
-        print('Running evaluation')
         if self.compute_sequencially:
             scores = self.run_sequentially()
         else:
@@ -31,7 +30,7 @@ class eval:
 
     def run_sequentially(self):
         scores = []
-        for i in tqdm(range(len(self.labels))):
+        for i in range(len(self.labels)):
             scores.append(self.get_score(i))
         return scores
 
@@ -45,45 +44,46 @@ class eval:
         y_train = list(self.labels) # copy
         x_test = X_train.pop(i)
         y_test = y_train.pop(i)
-        y_pred = self.get_knn_class(X_train, y_train, [x_test])
+        y_pred = get_knn_class(X_train, y_train, [x_test], self.num_neighbours)
         if y_pred[0] == y_test:
             return 1
         else:
             return 0
 
-    def get_knn_class(self, X_train, y_train, x_test):
-        neigh = KNeighborsClassifier(self.num_neighbours)
-        neigh.fit(X_train, y_train)
-        return neigh.predict(x_test)
+
+def get_knn_class(X_train, y_train, x_test, num_neighbours=3):
+    neigh = KNeighborsClassifier(num_neighbours)
+    neigh.fit(X_train, y_train)
+    return neigh.predict(x_test)
 
 
-def eval_torch_model(model, csv='wrangling/image_paths.csv'):
-    # if model == str then load model
-    trans = transforms.Compose([Rescale((512, 512)),
+def eval_torch_model(model, input_size=512, device='cuda', csv='wrangling/image_paths.csv'):
+    batch_size = 16
+    device = torch.device(device)
+    trans = transforms.Compose([Rescale((input_size, input_size)),
                                 ToTensor()])
-    transformed_dataset = get_training_data(transform=trans)
+    transformed_dataset = get_data(transform=trans, eval=True)
     dataloader = DataLoader(transformed_dataset,
-                            batch_size=1,
-                            shuffle=True,
-                            num_workers=4)
+                            batch_size=batch_size,
+                            shuffle=False,
+                            num_workers=12,
+                            prefetch_factor=1)
     embeddings = []
     labels = []
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = torch.jit.script(model).to(device)
+    model = model.to(device)
     count = 0
-    for sample in tqdm(dataloader):
+    for sample in dataloader:
         im = sample['image'].to(device=device, dtype=torch.float)
         embedding = model(im)
         #convert to numpy array
-        emeddings_array = embedding.cpu().detach().numpy()
-
-        embeddings.append(list(emeddings_array[0,:]))
-        labels.append(str(sample['label'].cpu().detach().numpy()))
+        embeddings_array = embedding.cpu().detach().numpy()
+        labels_array = sample['label'].cpu().detach().numpy()
+        for i in range(embeddings_array.shape[0]):  # loop over batch
+            embeddings.append(list(embeddings_array[i,:]))
+            labels.append(str(labels_array[i]))
         # if count >10:
         #     break
         count +=1
-    print(embeddings)
-    print(labels)
     eval(embeddings, labels, compute_sequencially=True)
 
 
@@ -92,8 +92,8 @@ if __name__ == '__main__':
     labels = ['a', 'b', 'b', 'a', 'a']
     # eval(embeddings, labels)
     import torch
-    from training.trainer import Network
+    from models.toy_network import Network
     model = Network(512, 16)
-    # model.load_state_dict(torch.load('data/files_to_gitignore/trained_simple_model.pth'))
-    # model.eval()
+    model.load_state_dict(torch.load('data/files_to_gitignore/trained_simple_model1.pth'))
+    model.eval()
     eval_torch_model(model)
