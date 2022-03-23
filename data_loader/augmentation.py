@@ -5,7 +5,8 @@ tsfm = Transform(params)
 transformed_sample = tsfm(sample)
 '''
 import numpy as np
-from torchvision import transforms, utils
+import torch
+from torchvision import transforms
 from skimage import transform
 
 class Rescale(object):
