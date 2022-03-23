@@ -55,6 +55,7 @@ class get_training_data:
         self.df = pd.read_csv(self.df_csv)
         self.image_paths = self.df['image_path'].tolist()
         self.similar_images = self.df['similar_images'].tolist()
+        self.labels = self.df['label'].tolist()
         # convert str of similar images to lists
         for i in range(len(self.similar_images)):
             self.similar_images[i] = ast.literal_eval(self.similar_images[i])
@@ -81,6 +82,8 @@ class get_training_data:
         # data transforms
         if self.transform:
             sample = self.transform(sample)
+        # add label to sample
+        sample['label'] = self.labels[i]
         return sample
 
 

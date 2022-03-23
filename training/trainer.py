@@ -23,18 +23,6 @@ epochs = 2
 
 input_size = 512
 
-# get data loader
-trans = transforms.Compose([Rescale((input_size+100, input_size+100)),
-                            RandomCrop(input_size),
-                            ToTensor()])
-transformed_dataset = get_training_data(transform=trans)
-
-dataloader = DataLoader(transformed_dataset,
-                        batch_size=batch_size,
-                        shuffle=True,
-                        num_workers=int(cores/2),
-                        prefetch_factor=prefetch_factor)
-
 
 # # test out speed of data loaders
 # for i in tqdm(range(len(transformed_dataset))):
@@ -106,55 +94,50 @@ class Network(nn.Module):
 #
 #
 #
-model = Network(input_size, embedding_dims)
-# model.apply(init_weights)
-model = torch.jit.script(model).to(device)
+if __name__ == '__main__':
 
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-# criterion = torch.jit.script(TripletLoss())
-criterion = TripletLoss()
+    # get data loader
+    trans = transforms.Compose([Rescale((input_size+100, input_size+100)),
+                                RandomCrop(input_size),
+                                ToTensor()])
+    transformed_dataset = get_training_data(transform=trans)
 
-def knn_eval(model, ):
-    # check features file exists (create if not)
-    csv = 'wrangling/image_paths.csv'
-    # load features
-    df = pd.read_csv(csv)
-    embeddings = []
-    # get all features from dataframe
-    for row in range(df.shape[0]):
-        # convert dict in str format to list of its values
-        path = df['image_path'][row]
+    dataloader = DataLoader(transformed_dataset,
+                            batch_size=batch_size,
+                            shuffle=True,
+                            num_workers=int(cores/2),
+                            prefetch_factor=prefetch_factor)
+    model = Network(input_size, embedding_dims)
+    # model.apply(init_weights)
+    model = torch.jit.script(model).to(device)
 
-        embeddings.append(list(dict_row.values()))
-    labels = list(df['label'])
-
-
-#train
-model.train()
-for epoch in tqdm(range(epochs), desc="Epochs"):
-    running_loss = []
-    for step, sample in enumerate(tqdm(dataloader, desc="Training", leave=False)):
-        anchor_img = sample['image'].to(device=device, dtype=torch.float)
-        positive_img = sample['positive'].to(device=device, dtype=torch.float)
-        negative_img = sample['negative'].to(device=device, dtype=torch.float)
-
-        # print(anchor_img.shape, positive_img.shape, negative_img.shape)
-
-        optimizer.zero_grad()
-        anchor_out = model(anchor_img)
-        positive_out = model(positive_img)
-        negative_out = model(positive_img)
-
-        loss = criterion(anchor_out, positive_out, negative_out)
-        loss.backward()
-        optimizer.step()
-
-        running_loss.append(loss.cpu().detach().numpy())
-        if step%10 == 0:
-            print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    # criterion = torch.jit.script(TripletLoss())
+    criterion = TripletLoss()
 
 
+    #train
+    model.train()
+    for epoch in tqdm(range(epochs), desc="Epochs"):
+        running_loss = []
+        for step, sample in enumerate(tqdm(dataloader, desc="Training", leave=False)):
+            anchor_img = sample['image'].to(device=device, dtype=torch.float)
+            positive_img = sample['positive'].to(device=device, dtype=torch.float)
+            negative_img = sample['negative'].to(device=device, dtype=torch.float)
 
-torch.save({"model_state_dict": model.state_dict(),
-            "optimzier_state_dict": optimizer.state_dict()
-           }, "data/files_to_gitignore/trained_simple_model.pth")
+            # print(anchor_img.shape, positive_img.shape, negative_img.shape)
+
+            optimizer.zero_grad()
+            anchor_out = model(anchor_img)
+            positive_out = model(positive_img)
+            negative_out = model(positive_img)
+
+            loss = criterion(anchor_out, positive_out, negative_out)
+            loss.backward()
+            optimizer.step()
+
+            running_loss.append(loss.cpu().detach().numpy())
+            if step%10 == 0:
+                print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
+                break
+        torch.save(model.state_dict(), 'data/files_to_gitignore/trained_simple_model'+str(epoch)+'.pth')

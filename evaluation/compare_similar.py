@@ -1,9 +1,15 @@
 '''
 compare to nearest embeddings and see if they are of the same class
 '''
+from torch.utils.data import Dataset, DataLoader
 import multiprocessing
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
+import sys
+sys.path.append('.')
+sys.path.append('..')
+from data_loader.load import get_training_data
+from data_loader.augmentation import *
 
 
 class eval:
@@ -51,7 +57,43 @@ class eval:
         return neigh.predict(x_test)
 
 
+def eval_torch_model(model, csv='wrangling/image_paths.csv'):
+    # if model == str then load model
+    trans = transforms.Compose([Rescale((512, 512)),
+                                ToTensor()])
+    transformed_dataset = get_training_data(transform=trans)
+    dataloader = DataLoader(transformed_dataset,
+                            batch_size=1,
+                            shuffle=True,
+                            num_workers=4)
+    embeddings = []
+    labels = []
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = torch.jit.script(model).to(device)
+    count = 0
+    for sample in tqdm(dataloader):
+        im = sample['image'].to(device=device, dtype=torch.float)
+        embedding = model(im)
+        #convert to numpy array
+        emeddings_array = embedding.cpu().detach().numpy()
+
+        embeddings.append(list(emeddings_array[0,:]))
+        labels.append(str(sample['label'].cpu().detach().numpy()))
+        # if count >10:
+        #     break
+        count +=1
+    print(embeddings)
+    print(labels)
+    eval(embeddings, labels, compute_sequencially=True)
+
+
 if __name__ == '__main__':
     embeddings = [[1,1], [2,4], [5,4], [2,1], [1,1]]
     labels = ['a', 'b', 'b', 'a', 'a']
-    eval(embeddings, labels)
+    # eval(embeddings, labels)
+    import torch
+    from training.trainer import Network
+    model = Network(512, 16)
+    # model.load_state_dict(torch.load('data/files_to_gitignore/trained_simple_model.pth'))
+    # model.eval()
+    eval_torch_model(model)
