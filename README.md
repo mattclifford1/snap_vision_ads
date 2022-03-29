@@ -1,6 +1,11 @@
 # Snap Vision Data Pipeline
 The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
 
+# Run the whole Pipeline with:
+```
+$ python pipeline.py
+```
+
 ### Uselink links
  - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
  - [Kaggle triplet loss](https://www.kaggle.com/code/hirotaka0122/triplet-loss-with-pytorch/notebook)
