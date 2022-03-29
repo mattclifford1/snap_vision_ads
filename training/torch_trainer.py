@@ -13,7 +13,7 @@ sys.path.append('..')
 from data_loader.load import get_data
 from data_loader.augmentation import *
 from evaluation.compare_similar import eval_torch_model
-from models.toy_network import Network
+from models.toy_network import toy_network
 
 
 class TripletLoss(nn.Module):
@@ -32,7 +32,7 @@ class TripletLoss(nn.Module):
         return losses.mean()
 
 
-def run(model, optimiser, criterion, dataloader, device):
+def _train(model, optimiser, criterion, dataloader, device, epochs):
     model = model.to(device)
     model.train()
     evaluation = []
@@ -57,39 +57,45 @@ def run(model, optimiser, criterion, dataloader, device):
             #     print("Step Loss: {:.4f}".format(loss.cpu().detach().numpy()))
         if (epoch)%5 == 0:
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
-            torch.save(model.state_dict(), 'data/files_to_gitignore/trained_simple_model'+str(epoch)+'.pth')
+            torch.save(model.state_dict(), 'data/files_to_gitignore/trained_'+model.__class__.__name__+'_epoch_'+str(epoch)+'.pth')
             evaluation.append(eval_torch_model(model, input_size))
-    print(evaluation)
+    print('training eval: ' evaluation)
     return model
 
 
-if __name__ == '__main__':
+def run(model, input_size, epochs=5):
     cores = multiprocessing.cpu_count()
     prefetch_factor = 2
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    embedding_dims = 64
     batch_size = 32
-    epochs = 100
-    input_size = 256
 
     # get data loader
     trans = transforms.Compose([Rescale((input_size+100, input_size+100)),
-                                RandomCrop(input_size),
-                                ToTensor()])
+    RandomCrop(input_size),
+    ToTensor()])
     transformed_dataset = get_data(transform=trans)
 
     dataloader = DataLoader(transformed_dataset,
-                            batch_size=batch_size,
-                            shuffle=True,
-                            num_workers=int(cores/2),
-                            prefetch_factor=prefetch_factor)
+    batch_size=batch_size,
+    shuffle=True,
+    num_workers=int(cores/2),
+    prefetch_factor=prefetch_factor)
 
-    model = Network(input_size, embedding_dims)
     optimiser = optim.Adam(model.parameters(), lr=0.001)
     criterion = TripletLoss()
 
     # train
-    model = run(model, optimiser, criterion, dataloader, device)
+    model = _train(model, optimiser, criterion, dataloader, device, epochs)
     # eval
     model.eval()
+    return model
+
+
+
+if __name__ == '__main__':
+    embedding_dims = 64
+    epochs = 100
+    input_size = 256
+    model = toy_network(input_size, embedding_dims)
+    model = run(model, epochs)
     eval_torch_model(model, input_size)

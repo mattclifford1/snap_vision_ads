@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 
 
-class Network(nn.Module):
+class toy_network(nn.Module):
     def __init__(self, input_size=30, emb_dim=128):
         self.conv_size_1 = 32
         self.conv_size_2 = 64
         self.kernel_size = 5
-        super(Network, self).__init__()
+        super(toy_network, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(3, self.conv_size_1, self.kernel_size),
             nn.PReLU(),
