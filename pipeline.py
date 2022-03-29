@@ -31,9 +31,9 @@ if 'simple' in ARGS.models_list:
 if 'triplet_simple_net' in ARGS.models_list:
     print('\nRunning simple neural network with triplet loss')
     embedding_dims = 64
-    epochs = 0
+    epochs = 1
     input_size = 256
     model = toy_network.toy_network(input_size, embedding_dims)
     model = torch_trainer.run(model, input_size, epochs)
     print('evaluation')
-    eval_torch_model(model, input_size)
+    eval_torch_model(model)

@@ -58,8 +58,8 @@ def _train(model, optimiser, criterion, dataloader, device, epochs):
         if (epoch)%5 == 0:
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
             torch.save(model.state_dict(), 'data/files_to_gitignore/trained_'+model.__class__.__name__+'_epoch_'+str(epoch)+'.pth')
-            evaluation.append(eval_torch_model(model, input_size))
-    print('training eval: ' evaluation)
+            evaluation.append(eval_torch_model(model))
+    print('training eval: ', evaluation)
     return model
 
 
@@ -98,4 +98,4 @@ if __name__ == '__main__':
     input_size = 256
     model = toy_network(input_size, embedding_dims)
     model = run(model, epochs)
-    eval_torch_model(model, input_size)
+    eval_torch_model(model)

@@ -7,6 +7,7 @@ class toy_network(nn.Module):
         self.conv_size_1 = 32
         self.conv_size_2 = 64
         self.kernel_size = 5
+        self.input_size = input_size
         super(toy_network, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(3, self.conv_size_1, self.kernel_size),
