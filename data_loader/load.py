@@ -84,9 +84,20 @@ class get_data:
         # data transforms
         if self.transform:
             sample = self.transform(sample)
+        sample = ToTensor(sample)
         # add label to sample
         sample['label'] = self.labels[i]
         return sample
+
+
+def ToTensor(sample):
+    """Convert ndarrays in sample to Tensors."""
+    # swap color axis because
+    # numpy image: H x W x C
+    # torch image: C x H x W
+    for key in sample.keys():
+        sample[key] = torch.from_numpy(sample[key].transpose((2, 0, 1)))
+    return sample
 
 
 if __name__ == '__main__':

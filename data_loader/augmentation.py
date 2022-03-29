@@ -59,20 +59,6 @@ class RandomCrop(object):
         return image
 
 
-class ToTensor(object):
-    """Convert ndarrays in sample to Tensors."""
-    def __call__(self, sample):
-        # swap color axis because
-        # numpy image: H x W x C
-        # torch image: C x H x W
-        for key in sample.keys():
-            sample[key] = self.to_tensor(sample[key])
-        return sample
-
-    def to_tensor(self, image):
-        return torch.from_numpy(image.transpose((2, 0, 1)))
-
-
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import sys

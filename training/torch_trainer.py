@@ -71,8 +71,7 @@ def run(model, input_size, epochs=5):
 
     # get data loader
     trans = transforms.Compose([Rescale((input_size+100, input_size+100)),
-    RandomCrop(input_size),
-    ToTensor()])
+    RandomCrop(input_size)])
     transformed_dataset = get_data(transform=trans)
 
     dataloader = DataLoader(transformed_dataset,
