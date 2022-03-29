@@ -11,7 +11,7 @@ from data_loader.augmentation import *
 
 
 class get_database:
-    def __init__(self, df_csv='wrangling/image_paths.csv'):
+    def __init__(self, df_csv='wrangling/image_paths_database_train.csv'):
         self.df_csv = df_csv
         self.check_csv_exists()
         self.load_df()
@@ -48,7 +48,7 @@ to be used with torch's dataloader when training with triplet loss
 '''
 class get_data:
     def __init__(self,
-                 df_csv='wrangling/image_paths.csv',
+                 df_csv='wrangling/image_paths_database_train.csv',
                  transform=None,
                  eval=False):
         self.df_csv = df_csv

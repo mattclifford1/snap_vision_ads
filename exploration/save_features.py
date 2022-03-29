@@ -11,7 +11,7 @@ from data_loader.load import get_database
 
 
 class save_simple_features:
-    def __init__(self, csv_file='wrangling/image_paths.csv', compute_sequencially=False):
+    def __init__(self, csv_file='wrangling/image_paths_database_train.csv', compute_sequencially=False):
         print('Making simple features')
         self.data = get_database()
         self.im_paths = []
@@ -45,7 +45,7 @@ class save_simple_features:
 if __name__ == '__main__':
     # set up command line arguments to specifiy where the dataset is
     parser = ArgumentParser()
-    parser.add_argument("--csv_file", default='wrangling/image_paths.csv')
+    parser.add_argument("--csv_file", default='wrangling/image_paths_database_train.csv')
     ARGS = parser.parse_args()
     # calculate and save all features
     save_simple_features(ARGS.csv_file)

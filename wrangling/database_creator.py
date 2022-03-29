@@ -17,7 +17,7 @@ def get_all_subdirs(dir):
     dirs.pop(0)  # remove first one with is the base dir
     return dirs
 
-def contruct_database(dir='data/uob_image_set'):
+def contruct_database(dir='data/uob_image_set', train_proportion=0.8):
     all_subdirs = get_all_subdirs(dir)
     all_images = []
     similar = []
@@ -40,12 +40,19 @@ def contruct_database(dir='data/uob_image_set'):
     df = pd.DataFrame(data={'image_path': all_images,
                             'similar_images': similar,
                             'label': labels})
+
+    # split into train/eval
+    rows = df.shape[0]
+    split_point = int(rows*train_proportion)
+    df_train = df.iloc[:split_point]
+    df_eval = df.iloc[split_point:]
     # print(df.head())
     folder = 'wrangling'
-    save_file = 'image_paths.csv'
+    save_file = 'image_paths_database'
     if os.path.isdir(folder):
         save_file = os.path.join(folder, save_file)
-    df.to_csv(save_file, index=False)
+    df_train.to_csv(save_file+'_train.csv', index=False)
+    df_eval.to_csv(save_file+'_eval.csv', index=False)
 
 
 if __name__ == '__main__':

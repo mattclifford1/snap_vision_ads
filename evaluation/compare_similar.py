@@ -57,11 +57,10 @@ def get_knn_class(X_train, y_train, x_test, num_neighbours=3):
     return neigh.predict(x_test)
 
 
-def eval_torch_model(model, device='cuda', csv='wrangling/image_paths.csv'):
+def eval_torch_model(model, device='cuda', csv='wrangling/image_paths_database_eval.csv'):
     batch_size = 16
     device = torch.device(device)
-    trans = transforms.Compose([Rescale((model.input_size, model.input_size)),
-                                ToTensor()])
+    trans = transforms.Compose([Rescale((model.input_size, model.input_size))])
     transformed_dataset = get_data(transform=trans, eval=True)
     dataloader = DataLoader(transformed_dataset,
                             batch_size=batch_size,
