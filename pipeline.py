@@ -12,6 +12,7 @@ parser = ArgumentParser()
 parser.add_argument("--dataset_dir", default='data/uob_image_set')
 parser.add_argument("--dataset_stats", default=False, action='store_true')
 parser.add_argument("-m", "--models_list", nargs="+", default='simple')
+parser.add_argument("--epochs", default=1, type=int)
 ARGS = parser.parse_args()
 
 print('Running Pipline with args: ', ARGS)
@@ -31,9 +32,8 @@ if 'simple' in ARGS.models_list:
 if 'triplet_simple_net' in ARGS.models_list:
     print('\nRunning simple neural network with triplet loss')
     embedding_dims = 64
-    epochs = 1
     input_size = 256
     model = toy_network.toy_network(input_size, embedding_dims)
-    model = torch_trainer.run(model, input_size, epochs)
+    model = torch_trainer.run(model, input_size, ARGS.epochs)
     print('evaluation')
     eval_torch_model(model)

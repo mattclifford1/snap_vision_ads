@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torchvision import transforms
 
 
 class toy_network(nn.Module):
@@ -27,8 +28,20 @@ class toy_network(nn.Module):
         )
 
     def forward(self, x):
+        x = self.check_input_size(x)
         x = self.conv(x)
         x = x.view(-1, 64*self.conv_final_dim*self.conv_final_dim)
         x = self.fc(x)
         # x = nn.functional.normalize(x)
+        return x
+
+    def check_input_size(self, x):
+        if isinstance(self.input_size, int):
+            H = self.input_size
+            W = self.input_size
+        else:
+            H = self.input_size[0]
+            W = self.input_size[1]
+        if x.shape[2] != H and x.shape[3] != W:
+            x = transforms.resuze(x, (H, W))
         return x
