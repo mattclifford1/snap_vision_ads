@@ -2,9 +2,15 @@
 The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
 ![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
-# Run the whole Pipeline with:
+# Running the Pipeline
+To run the whole pipeline use:
 ```
 $ python pipeline.py
+```
+To display the available command line arguments for the pipeline:
+
+```
+$ python pipeline.py --help
 ```
 
 ### Uselink links

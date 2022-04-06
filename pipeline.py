@@ -9,14 +9,14 @@ from evaluation import eval_torch_model
 
 if __name__ == '__main__':
     # get command line arguments
-    parser = ArgumentParser()
-    parser.add_argument("--dataset_dir", default='data/uob_image_set')
-    parser.add_argument("--checkpoint", default='data/files_to_gitignore/trained_toy_network_epoch_5.pth')
-    parser.add_argument("--dataset_stats", default=False, action='store_true')
-    parser.add_argument("--redo_simple_features", default=False, action='store_true')
-    parser.add_argument("--train", default=False, action='store_true')
-    parser.add_argument("-m", "--models_list", nargs="+", default='simple')
-    parser.add_argument("--epochs", default=1, type=int)
+    parser = ArgumentParser(description='Data pipeline for training and evaluating image embeddings')
+    parser.add_argument("--dataset_dir", default='data/uob_image_set', help='Location to read/save the uob_image_set used to training/eval')
+    parser.add_argument("--dataset_stats", default=False, action='store_true', help='prints out some basic statistics about the dataset')
+    parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'triplet_simple_net'], help='list of models to use')
+    parser.add_argument("--redo_simple_features", default=False, action='store_true', help='calculate simple image features from scratch rather than database look up')
+    parser.add_argument("--train", default=False, action='store_true', help='option to train the neural network')
+    parser.add_argument("--epochs", default=1, type=int, help='how many epochs to train for')
+    parser.add_argument("--checkpoint", default='data/files_to_gitignore/trained_toy_network_epoch_5.pth', help='how many epochs to train for')
     ARGS = parser.parse_args()
 
     print('Running Pipline with args: ', ARGS)
@@ -42,6 +42,7 @@ if __name__ == '__main__':
         embedding_dims = 64
         model = toy_network.toy_network(input_size, embedding_dims)
         if ARGS.train:
+            print('Training')
             model = torch_trainer.run(model, input_size, ARGS.epochs)
         else:
             toy_network.load_weights(model, ARGS.checkpoint)
