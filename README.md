@@ -5,6 +5,8 @@ The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual rep
 ```
 $ python pipeline.py
 ```
+# Pipeline
+![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 ### Uselink links
  - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
