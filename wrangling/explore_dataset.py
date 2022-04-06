@@ -40,6 +40,20 @@ def get_all_file_type(files):
             counter_dict[extension] = 1
     return counter_dict
 
+def print_stats(dataset_dir):
+    print('\n============= Dataset basic statistics =============')
+    all_subdirs = get_all_subdirs(dataset_dir)
+    print('Num of dirs: '+ str(len(all_subdirs)))
+    print_average_dir_contents(all_subdirs)
+    all_files = get_all_files(dataset_dir)
+    print('Num of files: '+ str(len(all_files)))
+    exts = get_all_file_type(all_files)
+    print('Different files extensions:')
+    for key in exts.keys():
+        print('   '+key+': '+str(exts[key]))
+    print('====================================================')
+
+
 
 if __name__ == '__main__':
     # set up command line arguments to specifiy where the dataset is
@@ -47,12 +61,4 @@ if __name__ == '__main__':
     parser.add_argument("--dir", default='data/uob_image_set')
     ARGS = parser.parse_args()
 
-    all_subdirs = get_all_subdirs(ARGS.dir)
-    print('Num of dirs: '+ str(len(all_subdirs)))
-    print_average_dir_contents(all_subdirs)
-    all_files = get_all_files(ARGS.dir)
-    print('Num of files: '+ str(len(all_files)))
-    exts = get_all_file_type(all_files)
-    print('Different files extensions:')
-    for key in exts.keys():
-        print('   '+key+': '+str(exts[key]))
+    print_stats(ARGS.dir)
