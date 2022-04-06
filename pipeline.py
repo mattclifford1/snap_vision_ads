@@ -5,7 +5,7 @@ from wrangling.database_creator import contruct_database
 from wrangling.explore_dataset import print_stats
 from models import simple, toy_network
 from training import torch_trainer
-from evaluation.compare_similar import eval_torch_model
+from evaluation import eval_torch_model
 
 if __name__ == '__main__':
     # get command line arguments
@@ -41,4 +41,4 @@ if __name__ == '__main__':
         model = toy_network.toy_network(input_size, embedding_dims)
         model = torch_trainer.run(model, input_size, ARGS.epochs)
         print('evaluation')
-        eval_torch_model(model)
+        eval_torch_model.run(model)
