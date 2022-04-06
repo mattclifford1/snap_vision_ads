@@ -11,7 +11,9 @@ from data_loader.load import get_database
 
 
 class save_simple_features:
-    def __init__(self, csv_file='wrangling/image_paths_database_train.csv', compute_sequencially=False):
+    def __init__(self, csv_file='wrangling/image_paths_database_train.csv',
+                       compute_sequencially=False,
+                       features_csv='exploration/database.csv'):
         print('Making simple features')
         self.data = get_database()
         self.im_paths = []
@@ -24,7 +26,7 @@ class save_simple_features:
             features = self.run_parellel()
 
         self.data.add_col(features, 'features')
-        self.data.save_df('exploration/database.csv')
+        self.data.save_df(features_csv)
 
     def get_feats_func(self, i): # wrapper for multiprocessing func
         return get_features(self.im_paths[i])

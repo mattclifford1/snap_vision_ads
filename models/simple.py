@@ -10,13 +10,15 @@ sys.path.append('..')
 from evaluation import compare_similar
 
 
-def run():
+def check_features(features_csv='exploration/database.csv'):
     # check features file exists (create if not)
     features_csv = 'exploration/database.csv'
     if not os.path.isfile(features_csv):
         from exploration import save_features
-        save_features.save_simple_features()
+        save_features.save_simple_features(features_csv=features_csv)
 
+def run(features_csv='exploration/database.csv'):
+    check_features(features_csv)
     # load features
     df = pd.read_csv(features_csv)
     embeddings = []
