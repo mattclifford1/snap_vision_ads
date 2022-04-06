@@ -9,7 +9,7 @@ from evaluation import eval_torch_model
 
 def print_results(results):
     for i in range(len(results['closest'])):
-        print('Closest '+str(i)+': ', results['closest'][i]*100, '%')
+        print('Closest '+str(i+1)+': ', results['closest'][i]*100, '%')
     print('Any closest embedding correct: '+str(results['in_any']*100))
 
 if __name__ == '__main__':
