@@ -7,6 +7,11 @@ from tqdm import tqdm
 
 
 class eval:
+    '''
+    compare emeddings to labels
+    embeddings: list of lists
+    labels: list of strs
+    '''
     def __init__(self, embeddings, labels, num_neighbours=3, compute_sequencially=False):
         self.embeddings = embeddings   # list
         self.labels = labels           # list
@@ -38,6 +43,7 @@ class eval:
         y_train = list(self.labels) # copy
         x_test = X_train.pop(i)
         y_test = y_train.pop(i)
+
         y_pred = get_knn_class(X_train, y_train, [x_test], self.num_neighbours)
         if y_pred[0] == y_test:
             return 1
