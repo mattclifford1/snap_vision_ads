@@ -4,5 +4,6 @@ pandas
 scikit-learn
 scikit-image
 scipy
+torch
 tqdm
 wget
