@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     if 'triplet_big_net' in ARGS.models_list:
         print('\nRunning big neural network with triplet loss')
-        input_size = 512
+        input_size = 1024
         embedding_dims = 128
         model = network.network(input_size, embedding_dims)
         if ARGS.train:

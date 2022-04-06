@@ -4,6 +4,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from torch.optim.lr_scheduler import ExponentialLR
+
 from tqdm import tqdm
 import multiprocessing
 
@@ -36,6 +38,7 @@ def _train(model, optimiser, criterion, dataloader, device, epochs):
     model = model.to(device)
     model.train()
     evaluation = []
+    scheduler = ExponentialLR(optimiser, gamma=0.9)
     for epoch in tqdm(range(epochs), desc="Epochs"):
 
         running_loss = []
@@ -56,11 +59,16 @@ def _train(model, optimiser, criterion, dataloader, device, epochs):
             running_loss.append(loss.cpu().detach().numpy())
             # if step%10 == 0:
             #     print("Step Loss: {:.4f}".format(loss.cpu().detach().numpy()))
-        if (epoch)%5 == 0:
+        if (epoch)%2 == 0:
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
             torch.save(model.state_dict(), 'data/files_to_gitignore/trained_'+model.__class__.__name__+'_epoch_'+str(epoch)+'.pth')
-            evaluation.append(eval_torch_model.run(model)['in_any']*100)
+            acc = eval_torch_model.run(model)['in_any']*100
+            print(acc)
+            evaluation.append(acc)
             model.train()   # put back into train mode
+        else:
+            torch.save(model.state_dict(), 'data/files_to_gitignore/trained_'+model.__class__.__name__+'temp_save.pth')
+        scheduler.step() # lower optimiser learning rate
     print('training eval: ', evaluation)
     return model
 

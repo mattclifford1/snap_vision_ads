@@ -13,42 +13,36 @@ class network(nn.Module):
         self.conv_size_2 = 32
         self.conv_size_3 = 64
         self.conv_size_4 = 128
-        self.conv_size_5 = 256
-        self.kernel_size = 10
         self.input_size = input_size
-        self.final_conv_dims = 7*7*self.conv_size_5
+        self.final_conv_dims = 29*29*self.conv_size_4
 
         self.conv1 = nn.Sequential(
-            nn.Conv2d(3, self.conv_size_1, self.kernel_size),
+            nn.Conv2d(3, self.conv_size_1, 7),
             nn.PReLU(),
-            nn.MaxPool2d(2, stride=2),
+            nn.MaxPool2d(4, stride=4),
             nn.Dropout(0.3))
         self.conv2 = nn.Sequential(
-            nn.Conv2d(self.conv_size_1, self.conv_size_2, self.kernel_size),
+            nn.Conv2d(self.conv_size_1, self.conv_size_2, 5),
             nn.PReLU(),
-            nn.MaxPool2d(2, stride=2),
+            nn.MaxPool2d(4, stride=2),
             nn.Dropout(0.3))
         self.conv3 = nn.Sequential(
-            nn.Conv2d(self.conv_size_2, self.conv_size_3, self.kernel_size),
+            nn.Conv2d(self.conv_size_2, self.conv_size_3, 5),
             nn.PReLU(),
             nn.MaxPool2d(2, stride=2),
             nn.Dropout(0.3))
         self.conv4 = nn.Sequential(
-            nn.Conv2d(self.conv_size_3, self.conv_size_4, self.kernel_size),
-            nn.PReLU(),
-            nn.MaxPool2d(2, stride=2),
-            nn.Dropout(0.3))
-        self.conv5 = nn.Sequential(
-            nn.Conv2d(self.conv_size_4, self.conv_size_5, self.kernel_size),
+            nn.Conv2d(self.conv_size_3, self.conv_size_4, 3),
             nn.PReLU(),
             nn.MaxPool2d(2, stride=2),
             nn.Dropout(0.3))
 
+
         self.fc = nn.Sequential(
-            nn.Linear(self.final_conv_dims, emb_dim*4),
+            nn.Linear(self.final_conv_dims, emb_dim*2),
             # nn.Linear(64*self.conv_final_dim*self.conv_final_dim, emb_dim*2),
             nn.PReLU(),
-            nn.Linear(emb_dim*4, emb_dim)
+            nn.Linear(emb_dim*2, emb_dim)
         )
 
     def forward(self, x):
@@ -57,10 +51,10 @@ class network(nn.Module):
         x = self.conv2(x)
         x = self.conv3(x)
         x = self.conv4(x)
-        x = self.conv5(x)
+        # print(x.shape)
         x = x.view(-1, self.final_conv_dims)
         x = self.fc(x)
-        # x = nn.functional.normalize(x)
+        x = nn.functional.normalize(x)
         return x
 
     def check_input_size(self, x):
