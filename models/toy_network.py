@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 from torchvision import transforms
+import os
+import errno
 
 
 class toy_network(nn.Module):
@@ -45,3 +47,9 @@ class toy_network(nn.Module):
         if x.shape[2] != H and x.shape[3] != W:
             x = transforms.resuze(x, (H, W))
         return x
+
+def load_weights(model, weights_path):
+    if not os.path.isfile(weights_path):
+        # raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), weights_path)
+        raise ValueError("Couldn't find network weights path: "+str(weights_path)+"\nMaybe you need to train first?")
+    model.load_state_dict(torch.load(weights_path))

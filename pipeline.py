@@ -11,8 +11,10 @@ if __name__ == '__main__':
     # get command line arguments
     parser = ArgumentParser()
     parser.add_argument("--dataset_dir", default='data/uob_image_set')
+    parser.add_argument("--checkpoint", default='data/files_to_gitignore/trained_toy_network_epoch_5.pth')
     parser.add_argument("--dataset_stats", default=False, action='store_true')
     parser.add_argument("--redo_simple_features", default=False, action='store_true')
+    parser.add_argument("--train", default=False, action='store_true')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple')
     parser.add_argument("--epochs", default=1, type=int)
     ARGS = parser.parse_args()
@@ -36,9 +38,12 @@ if __name__ == '__main__':
 
     if 'triplet_simple_net' in ARGS.models_list:
         print('\nRunning simple neural network with triplet loss')
-        embedding_dims = 64
         input_size = 256
+        embedding_dims = 64
         model = toy_network.toy_network(input_size, embedding_dims)
-        model = torch_trainer.run(model, input_size, ARGS.epochs)
-        print('evaluation')
+        if ARGS.train:
+            model = torch_trainer.run(model, input_size, ARGS.epochs)
+        else:
+            toy_network.load_weights(model, ARGS.checkpoint)
         eval_torch_model.run(model)
+        print('evaluation')

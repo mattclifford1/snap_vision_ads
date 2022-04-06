@@ -42,8 +42,8 @@ def run(model,
 
 if __name__ == '__main__':
     import torch
-    from models.toy_network import Network
-    model = Network(512, 16)
-    model.load_state_dict(torch.load('data/files_to_gitignore/trained_simple_model1.pth'))
+    from models import toy_network
+    model = toy_network.Network(512, 16)
+    toy_network.load_weights(model, 'data/files_to_gitignore/trained_simple_model1.pth')
     model.eval()
     run(model)
