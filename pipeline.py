@@ -18,22 +18,23 @@ ARGS = parser.parse_args()
 print('Running Pipline with args: ', ARGS)
 # contruct database from uob_image_set dataset
 # it will download and upzip dataset if not found locally
-contruct_database(ARGS.dataset_dir)
+if __name__ == '__main__':
+    contruct_database(ARGS.dataset_dir)
 
-# print out some basics stats exploring the dataset
-if ARGS.dataset_stats:
-    print_stats(ARGS.dataset_dir)
+    # print out some basics stats exploring the dataset
+    if ARGS.dataset_stats:
+        print_stats(ARGS.dataset_dir)
 
-# run models
-if 'simple' in ARGS.models_list:
-    print('\nRunning simple model')
-    simple.run()
+    # run models
+    if 'simple' in ARGS.models_list:
+        print('\nRunning simple model')
+        simple.run()
 
-if 'triplet_simple_net' in ARGS.models_list:
-    print('\nRunning simple neural network with triplet loss')
-    embedding_dims = 64
-    input_size = 256
-    model = toy_network.toy_network(input_size, embedding_dims)
-    model = torch_trainer.run(model, input_size, ARGS.epochs)
-    print('evaluation')
-    eval_torch_model(model)
+    if 'triplet_simple_net' in ARGS.models_list:
+        print('\nRunning simple neural network with triplet loss')
+        embedding_dims = 64
+        input_size = 256
+        model = toy_network.toy_network(input_size, embedding_dims)
+        model = torch_trainer.run(model, input_size, ARGS.epochs)
+        print('evaluation')
+        eval_torch_model(model)
