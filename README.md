@@ -1,12 +1,11 @@
 # Snap Vision Data Pipeline
 The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
+![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 # Run the whole Pipeline with:
 ```
 $ python pipeline.py
 ```
-# Pipeline
-![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 ### Uselink links
  - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
