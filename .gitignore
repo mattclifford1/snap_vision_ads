@@ -138,3 +138,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+exploration/database.csv
+wrangling/image_paths_database_eval.csv
+wrangling/image_paths_database_train.csv
