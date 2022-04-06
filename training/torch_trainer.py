@@ -59,17 +59,16 @@ def _train(model, optimiser, criterion, dataloader, device, epochs):
         if (epoch)%5 == 0:
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch+1, epochs, np.mean(running_loss)))
             torch.save(model.state_dict(), 'data/files_to_gitignore/trained_'+model.__class__.__name__+'_epoch_'+str(epoch)+'.pth')
-            evaluation.append(eval_torch_model.run(model))
+            evaluation.append(eval_torch_model.run(model)['in_any']*100)
             model.train()   # put back into train mode
     print('training eval: ', evaluation)
     return model
 
 
-def run(model, input_size, epochs=5):
+def run(model, input_size, epochs=5, batch_size=32):
     cores = multiprocessing.cpu_count()
     prefetch_factor = 2
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    batch_size = 32
 
     # get data loader
     trans = transforms.Compose([Rescale((input_size+100, input_size+100)),

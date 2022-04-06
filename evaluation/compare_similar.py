@@ -3,6 +3,7 @@ compare to nearest embeddings and see if they are of the same class
 '''
 import multiprocessing
 from sklearn.neighbors import KNeighborsClassifier
+import numpy as np
 from tqdm import tqdm
 
 
@@ -12,7 +13,7 @@ class eval:
     embeddings: list of lists
     labels: list of strs
     '''
-    def __init__(self, embeddings, labels, num_neighbours=3, compute_sequencially=False):
+    def __init__(self, embeddings, labels, num_neighbours=5, compute_sequencially=False):
         self.embeddings = embeddings   # list
         self.labels = labels           # list
         self.num_neighbours = num_neighbours
@@ -24,8 +25,23 @@ class eval:
             scores = self.run_sequentially()
         else:
             scores = self.run_parellel()
-        self.accuracy = (sum(scores)/len(scores))
-        print('Accuracy: ', self.accuracy*100, '%')
+        scores = np.array(scores) # first col is actual, following cols are closest neighbours
+        self.closest = []
+        total = []
+        for i in range(1, scores.shape[1]):
+            same_elements = (scores[:, 0] == scores[:, i])
+            total.append(same_elements)
+            acc = np.sum(same_elements)/len(same_elements)
+            self.closest.append(acc)
+        # calcuate if class in any of the nearest embeddings
+        total = np.array(total).T
+        count = 0
+        for i in range(total.shape[0]):
+            if True in total[i, :]:
+                count += 1
+        self.accuracy = count/total.shape[0]
+        self.results = {'closest':self.closest,
+                        'in_any': self.accuracy}
 
     def run_sequentially(self):
         scores = []
@@ -44,17 +60,18 @@ class eval:
         x_test = X_train.pop(i)
         y_test = y_train.pop(i)
 
-        y_pred = get_knn_class(X_train, y_train, [x_test], self.num_neighbours)
-        if y_pred[0] == y_test:
-            return 1
-        else:
-            return 0
+        y_pred = get_knn_closest(X_train, y_train, [x_test], self.num_neighbours)
+        return [y_test] + y_pred
 
 
-def get_knn_class(X_train, y_train, x_test, num_neighbours=3):
-    neigh = KNeighborsClassifier(num_neighbours)
-    neigh.fit(X_train, y_train)
-    return neigh.predict(x_test)
+def get_knn_closest(X_train, y_train, x_test, num_neighbours=5):
+    knn = KNeighborsClassifier(num_neighbours)
+    knn.fit(X_train, y_train)
+    closest_inds = knn.kneighbors(x_test, return_distance=False)[0]
+    neighbours = []
+    for ind in closest_inds:
+        neighbours.append(y_train[ind])
+    return neighbours
 
 
 if __name__ == '__main__':

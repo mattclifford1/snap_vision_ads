@@ -42,7 +42,7 @@ def run(model,
             count +=1
         # evaluate embeddings
         evaller = eval(embeddings, labels, compute_sequencially=True)
-    return evaller.accuracy*100
+    return evaller.results
 
 
 if __name__ == '__main__':
