@@ -48,10 +48,12 @@ to be used with torch's dataloader when training with triplet loss
 '''
 class get_data:
     def __init__(self,
-                 df_csv='wrangling/image_paths_database_train.csv',
                  transform=None,
                  eval=False):
-        self.df_csv = df_csv
+        if eval == True:
+            self.df_csv = 'wrangling/image_paths_database_eval.csv'
+        else:
+            self.df_csv = 'wrangling/image_paths_database_train.csv'
         self.transform = transform
         self.eval = eval
         self.df = pd.read_csv(self.df_csv)

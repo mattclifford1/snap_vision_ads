@@ -1,34 +1,34 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 import sys
+import multiprocessing
 sys.path.append('.')
 sys.path.append('..')
 from data_loader.load import get_data
 from data_loader.augmentation import *
 from evaluation.compare_similar import eval
+from tqdm import tqdm
 
 
-def run(model,
-        device='cuda',
-        csv='wrangling/image_paths_database_eval.csv',
-        batch_size=16):
+def run(model, batch_size=16):
     with torch.no_grad():
         # set up model and dataloader
+        cores = multiprocessing.cpu_count()
         model.eval()
-        device = torch.device(device)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
         trans = transforms.Compose([Rescale((model.input_size, model.input_size))])
         transformed_dataset = get_data(transform=trans, eval=True)
         dataloader = DataLoader(transformed_dataset,
                                 batch_size=batch_size,
                                 shuffle=False,
-                                num_workers=12,
-                                prefetch_factor=1)
+                                num_workers=int(cores/2),
+                                prefetch_factor=2)
         # get embeddings from model
         embeddings = []
         labels = []
         count = 0
-        for sample in dataloader:
+        for step, sample in enumerate(tqdm(dataloader, desc="Eval Steps", leave=False)):
             im = sample['image'].to(device=device, dtype=torch.float)
             embedding = model(im)
             #convert to numpy array
@@ -41,7 +41,10 @@ def run(model,
             #     break
             count +=1
         # evaluate embeddings
+        # torch.set_num_threads(1)
+        # evaller = eval(embeddings, labels)
         evaller = eval(embeddings, labels, compute_sequencially=True)
+        # torch.set_num_threads(cores)
     return evaller.results
 
 

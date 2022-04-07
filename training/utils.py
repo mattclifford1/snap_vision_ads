@@ -1,5 +1,7 @@
 import os
 import torch
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)   # porch warning we dont care about
 
 
 def get_save_dir(base_dir, model, lr):
@@ -24,9 +26,10 @@ def load_pretrained(model, base_dir, lr):
     if len(saves) > 0:
         latest_epoch = max(saves)
         weights_path = os.path.join(dir, str(latest_epoch)+'.pth')
-        model.load_state_dict(torch.load(weights_path))
-        print('Loaded pretrained model at epoch: '+str(latest_epoch))
-        return latest_epoch
+        # model.load_state_dict(torch.load(weights_path))
+        # print('Loaded pretrained model at epoch: '+str(latest_epoch))
+        # return latest_epoch
+        return 0
     else:
         return 0 #no pretrained found
 

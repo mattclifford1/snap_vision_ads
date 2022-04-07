@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import os
 
+from data import download, resize_dataset
 from wrangling.database_creator import contruct_database
 from wrangling.explore_dataset import print_stats
 from models import simple, toy_network, network, FaceNet, utils
@@ -15,7 +16,8 @@ def print_results(results):
 def train_network(model, input_size, ARGS):
     if ARGS.train:
         print('Training')
-        model = torch_trainer.run(model, input_size, ARGS.epochs, ARGS.batch_size, ARGS.save_dir)
+        trainer = torch_trainer.trainer(model, ARGS.epochs, ARGS.batch_size, ARGS.save_dir)
+        model = trainer.start()
     else:
         utils.load_weights(model, ARGS.checkpoint)
     print('evaluation')
@@ -26,7 +28,8 @@ def train_network(model, input_size, ARGS):
 if __name__ == '__main__':
     # get command line arguments
     parser = ArgumentParser(description='Data pipeline for training and evaluating image embeddings')
-    parser.add_argument("--dataset_dir", default='data/uob_image_set', help='Location to read/save the uob_image_set used to training/eval')
+    parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
+    parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("--dataset_stats", default=False, action='store_true', help='prints out some basic statistics about the dataset')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
     parser.add_argument("--redo_simple_features", default=False, action='store_true', help='calculate simple image features from scratch rather than database look up')
@@ -38,13 +41,19 @@ if __name__ == '__main__':
     ARGS = parser.parse_args()
 
     print('Running Pipline with args: ', ARGS)
+
+    # download and upzip dataset if not found
+    data_dir = download.get_if_doesnt_exist(ARGS.dataset_dir)
+    # downscale the dataset if required
+    if not ARGS.big_ims:
+        data_dir = resize_dataset.run(data_dir, 512)
+
     # contruct database from uob_image_set dataset
-    # it will download and upzip dataset if not found locally
-    contruct_database(ARGS.dataset_dir)
+    contruct_database(data_dir)
 
     # print out some basics stats exploring the dataset
     if ARGS.dataset_stats:
-        print_stats(ARGS.dataset_dir)
+        print_stats(data_dir)
 
     # run models
     if 'simple' in ARGS.models_list:
@@ -64,7 +73,7 @@ if __name__ == '__main__':
 
     if 'big_net' in ARGS.models_list:
         print('\nRunning big neural network with triplet loss')
-        input_size = 1024
+        input_size = 512
         embedding_dims = 128
         model = network.network(input_size, embedding_dims)
         train_network(model, input_size, ARGS)

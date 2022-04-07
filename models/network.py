@@ -14,12 +14,12 @@ class network(nn.Module):
         self.conv_size_3 = 64
         self.conv_size_4 = 128
         self.input_size = input_size
-        self.final_conv_dims = 29*29*self.conv_size_4
+        self.final_conv_dims = 28*28*self.conv_size_4
 
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, self.conv_size_1, 7),
             nn.PReLU(),
-            nn.MaxPool2d(4, stride=4),
+            nn.MaxPool2d(2, stride=2),
             nn.Dropout(0.3))
         self.conv2 = nn.Sequential(
             nn.Conv2d(self.conv_size_1, self.conv_size_2, 5),

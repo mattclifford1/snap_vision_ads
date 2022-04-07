@@ -1,7 +1,8 @@
 '''
 compare to nearest embeddings and see if they are of the same class
 '''
-import multiprocessing
+# import multiprocessing
+import torch.multiprocessing as multiprocessing
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 from tqdm import tqdm
@@ -45,13 +46,13 @@ class eval:
 
     def run_sequentially(self):
         scores = []
-        for i in range(len(self.labels)):
+        for i in tqdm(range(len(self.labels)), desc="Eval Sequential compute", leave=False):
             scores.append(self.get_score(i))
         return scores
 
     def run_parellel(self):
         pool_obj = multiprocessing.Pool()
-        scores = list(tqdm(pool_obj.imap(self.get_score, range(len(self.labels))), total=len(self.labels)))
+        scores = list(tqdm(pool_obj.imap(self.get_score, range(len(self.labels))), total=len(self.labels), desc="Eval Pararrel compute", leave=False))
         return scores
 
     def get_score(self, i):
