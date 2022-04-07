@@ -54,7 +54,7 @@ class network(nn.Module):
         # print(x.shape)
         x = x.view(-1, self.final_conv_dims)
         x = self.fc(x)
-        x = nn.functional.normalize(x)
+        # x = nn.functional.normalize(x)
         return x
 
     def check_input_size(self, x):

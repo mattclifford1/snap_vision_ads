@@ -10,11 +10,11 @@ from evaluation.compare_similar import eval
 
 def run(model,
         device='cuda',
-        csv='wrangling/image_paths_database_eval.csv'):
+        csv='wrangling/image_paths_database_eval.csv',
+        batch_size=16):
     with torch.no_grad():
         # set up model and dataloader
         model.eval()
-        batch_size = 16
         device = torch.device(device)
         model = model.to(device)
         trans = transforms.Compose([Rescale((model.input_size, model.input_size))])
