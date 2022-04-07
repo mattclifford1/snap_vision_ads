@@ -73,5 +73,5 @@ if __name__ == '__main__':
         print('\nRunning FaceNetInception with triplet loss')
         input_size = 224
         embedding_dims = 128
-        model = FaceNet.FaceNetInception(embedding_dims)
+        model = FaceNet.FaceNetInception(input_size, embedding_dims)
         train_network(model, input_size, ARGS)
