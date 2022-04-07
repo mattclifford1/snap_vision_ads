@@ -52,7 +52,7 @@ class trainer():
                     running_loss.append(loss.cpu().detach().numpy())
 
                 # get validation stats and save the trained model
-                if (epoch)%5 == 0:
+                if (epoch)%2 == 0:
                     save_model(self.save_dir, self.model, self.lr, epoch+1)
                     eval = eval_torch_model.run(self.model, batch_size=self.dataloader.batch_size)
                     acc = eval['in_any']*100
