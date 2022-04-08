@@ -21,7 +21,12 @@ from training.utils import *
 
 class trainer():
     def __init__(self, model, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
-        self.lr = 0.0001
+        # training settings
+        self.lr = 0.001
+        self.lr_decay_epoch = 10
+        self.save_epoch = 20
+        self.eval_epoch = 2
+        # save inputs to self
         self.model = model
         self.epochs = epochs
         self.batch_size = batch_size
@@ -29,7 +34,9 @@ class trainer():
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.cores = multiprocessing.cpu_count()
         # get data loader
-        prefetch_factor = 2
+        self.get_data_loader(prefetch_factor=2)
+
+    def get_data_loader(self, prefetch_factor=2):
         trans = transforms.Compose([Rescale((self.model.input_size+100, self.model.input_size+100)),
         RandomCrop(self.model.input_size)])
         transformed_dataset = get_data(transform=trans)
@@ -39,6 +46,17 @@ class trainer():
                                      num_workers=int(self.cores/2),
                                      prefetch_factor=prefetch_factor)
 
+    def setup(self):
+        # optimser
+        self.optimiser = optim.Adam(self.model.parameters(), self.lr)
+        # criterion = TripletLoss()
+        self.criterion = nn.TripletMarginLoss(margin=1.0, p=2)
+        # load pretrained model if availbale
+        self.start_epoch = load_pretrained(self.model, self.save_dir, self.lr)
+        # set up model for training
+        self.model = self.model.to(self.device)
+        self.model.train()
+        self.scheduler = ExponentialLR(self.optimiser, gamma=0.98)
 
     def start(self):
         self.setup()
@@ -50,18 +68,18 @@ class trainer():
                     loss = self.train_step(sample)
                     # log the loss
                     running_loss.append(loss.cpu().detach().numpy())
-
-                # get validation stats and save the trained model
-                if (epoch)%2 == 0:
-                    save_model(self.save_dir, self.model, self.lr, epoch+1)
+                if epoch%self.eval_epoch == 0: # get validation stats
                     eval = eval_torch_model.run(self.model, batch_size=self.dataloader.batch_size)
                     acc = eval['in_any']*100
                     print('Training loss: '+str(np.mean(running_loss))+' Eval score: '+str(acc))
                     self.evaluation.append(acc)
                     self.model.train()   # put back into train mode
-                else:
-                    save_model(self.save_dir, self.model, self.lr, 'temp_save')
-            self.scheduler.step() # lower optimiser learning rate
+                if epoch%self.save_epoch == 0: # save the trained model
+                    save_model(self.save_dir, self.model, self.lr, epoch+1)
+            if epoch%self.lr_decay_epoch  == 0:
+                self.scheduler.step() # lower optimiser learning rate
+
+        # training finished
         save_model(self.save_dir, self.model, self.lr, epoch+1)
         print('training eval: ', self.evaluation)
         self.model.eval()
@@ -86,18 +104,6 @@ class trainer():
         loss.backward()
         self.optimiser.step()
         return loss
-
-    def setup(self):
-        # optimser
-        self.optimiser = optim.Adam(self.model.parameters(), self.lr)
-        # criterion = TripletLoss()
-        self.criterion = nn.TripletMarginLoss(margin=1.0, p=2)
-        # load pretrained model if availbale
-        self.start_epoch = load_pretrained(self.model, self.save_dir, self.lr)
-        # set up model for training
-        self.model = self.model.to(self.device)
-        self.model.train()
-        self.scheduler = ExponentialLR(self.optimiser, gamma=0.9)
 
 
 if __name__ == '__main__':

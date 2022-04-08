@@ -16,6 +16,9 @@ def print_results(results):
 
 
 def train_network(model, input_size, ARGS):
+    # print('Before training Evaluation (Random weights)')
+    # results = eval_torch_model.run(model, batch_size=ARGS.batch_size)
+    # print_results(results)
     if ARGS.train:
         print('Training')
         trainer = torch_trainer.trainer(model, ARGS.epochs, ARGS.batch_size, ARGS.save_dir)
