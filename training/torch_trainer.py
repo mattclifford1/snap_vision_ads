@@ -20,9 +20,9 @@ from training.utils import *
 
 
 class trainer():
-    def __init__(self, model, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
+    def __init__(self, model, lr=0.001, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
         # training settings
-        self.lr = 0.001
+        self.lr = lr
         self.lr_decay_epoch = 10
         self.save_epoch = 20
         self.eval_epoch = 2
