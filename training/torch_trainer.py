@@ -22,12 +22,12 @@ from training.utils import *
 class trainer():
     def __init__(self, model, lr=0.001, lr_decay=0.95, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
         # training settings
-        self.lr = lr
-        self.lr_decay = lr_decay
         self.lr_decay_epoch = 10
         self.save_epoch = 20
         self.eval_epoch = 2
         # save inputs to self
+        self.lr = lr
+        self.lr_decay = lr_decay
         self.model = model
         self.epochs = epochs
         self.batch_size = batch_size
@@ -53,7 +53,7 @@ class trainer():
         # criterion = TripletLoss()
         self.criterion = nn.TripletMarginLoss(margin=1.0, p=2)
         # load pretrained model if availbale
-        self.start_epoch = load_pretrained(self.model, self.save_dir, self.lr)
+        self.start_epoch = load_pretrained(self.model, self.save_dir, self.lr, self.lr_decay, self.batch_size)
         # set up model for training
         self.model = self.model.to(self.device)
         self.model.train()
