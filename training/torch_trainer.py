@@ -20,9 +20,10 @@ from training.utils import *
 
 
 class trainer():
-    def __init__(self, model, lr=0.001, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
+    def __init__(self, model, lr=0.001, lr_decay=0.95, epochs=5, batch_size=16, save_dir='data/files_to_gitignore'):
         # training settings
         self.lr = lr
+        self.lr_decay = lr_decay
         self.lr_decay_epoch = 10
         self.save_epoch = 20
         self.eval_epoch = 2
@@ -56,7 +57,7 @@ class trainer():
         # set up model for training
         self.model = self.model.to(self.device)
         self.model.train()
-        self.scheduler = ExponentialLR(self.optimiser, gamma=0.98)
+        self.scheduler = ExponentialLR(self.optimiser, gamma=self.lr_decay)
 
     def start(self):
         self.setup()
@@ -75,12 +76,12 @@ class trainer():
                     self.evaluation.append(acc)
                     self.model.train()   # put back into train mode
                 if epoch%self.save_epoch == 0: # save the trained model
-                    save_model(self.save_dir, self.model, self.lr, epoch+1)
+                    save_model(self.save_dir, self.model, self.lr, self.lr_decay, self.batch_size, epoch+1)
             if epoch%self.lr_decay_epoch  == 0:
                 self.scheduler.step() # lower optimiser learning rate
 
         # training finished
-        save_model(self.save_dir, self.model, self.lr, epoch+1)
+        save_model(self.save_dir, self.model, self.lr, self.lr_decay, self.batch_size, epoch+1)
         print('training eval: ', self.evaluation)
         self.model.eval()
         return self.model

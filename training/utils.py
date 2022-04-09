@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore", category=UserWarning)   # porch warning we don
 
 def get_save_dir(base_dir, model, lr):
     model_name = model.__class__.__name__
-    path = os.path.join(base_dir, model_name+'_LR_'+str(lr))
+    path = os.path.join(base_dir, model_name)
     return path
 
 def load_pretrained(model, base_dir, lr):
@@ -33,6 +33,9 @@ def load_pretrained(model, base_dir, lr):
     else:
         return 0 #no pretrained found
 
-def save_model(base_dir, model, lr, epoch):
-    dir = get_save_dir(base_dir, model, lr)
+def save_model(base_dir, model, lr, lr_decay, batch_size, epoch):
+    dir = get_save_dir(base_dir, model)
+    dir = dir +'_LR_'+str(lr)
+    dir = dir +'_decay_'+str(lr_decay)
+    dir = dir +'_BS_'+str(batch_size)
     torch.save(model.state_dict(), os.path.join(dir, str(epoch)+'.pth'))
