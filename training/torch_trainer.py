@@ -52,37 +52,40 @@ class trainer():
         self.optimiser = optim.Adam(self.model.parameters(), self.lr)
         # criterion = TripletLoss()
         self.criterion = nn.TripletMarginLoss(margin=1.0, p=2)
+        # init the saver util
+        self.saver = train_saver(self.save_dir, self.model, self.lr, self.lr_decay, self.batch_size)
         # load pretrained model if availbale
-        self.start_epoch = load_pretrained(self.model, self.save_dir, self.lr, self.lr_decay, self.batch_size)
+        self.start_epoch = self.saver.load_pretrained(self.model)
         # set up model for training
         self.model = self.model.to(self.device)
         self.model.train()
         self.scheduler = ExponentialLR(self.optimiser, gamma=self.lr_decay)
+        self.running_loss = [0]
 
     def start(self):
         self.setup()
-        self.evaluation = []
+        self.eval(0)
+        # training loop
         for epoch in tqdm(range(self.epochs), desc="Epochs"):
             if epoch >= self.start_epoch:
-                running_loss = []
+                self.running_loss = []
+                # train for one epoch
                 for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=False)):
-                    loss = self.train_step(sample)
-                    # log the loss
-                    running_loss.append(loss.cpu().detach().numpy())
-                if epoch%self.eval_epoch == 0: # get validation stats
-                    eval = eval_torch_model.run(self.model, batch_size=self.dataloader.batch_size)
-                    acc = eval['in_any']*100
-                    print('Training loss: '+str(np.mean(running_loss))+' Eval score: '+str(acc))
-                    self.evaluation.append(acc)
-                    self.model.train()   # put back into train mode
-                if epoch%self.save_epoch == 0: # save the trained model
-                    save_model(self.save_dir, self.model, self.lr, self.lr_decay, self.batch_size, epoch+1)
+                    self.train_step(sample)
+
+                # maybe eval, save model and lower learning rate
+                if epoch%self.eval_epoch == 0:
+                    # get validation stats and log results
+                    self.eval(epoch+1)
+                if epoch%self.save_epoch == 0:
+                    # save the trained model
+                    self.saver.save_model(self.model, epoch+1)
             if epoch%self.lr_decay_epoch  == 0:
-                self.scheduler.step() # lower optimiser learning rate
+                # lower optimiser learning rate
+                self.scheduler.step()
 
         # training finished
-        save_model(self.save_dir, self.model, self.lr, self.lr_decay, self.batch_size, epoch+1)
-        print('training eval: ', self.evaluation)
+        self.saver.save_model(self.model, epoch+1)
         self.model.eval()
         return self.model
 
@@ -104,7 +107,17 @@ class trainer():
         # backward pass
         loss.backward()
         self.optimiser.step()
-        return loss
+        self.running_loss.append(loss.cpu().detach().numpy()) # save the loss stats
+
+    def eval(self, epoch):
+        eval = eval_torch_model.run(self.model, batch_size=self.dataloader.batch_size)
+        eval_acc = eval['in_any']*100
+        stats = {'epoch': [epoch],
+                 'mean training loss': [np.mean(self.running_loss)],
+                 'evaluation score': [eval_acc]}
+        self.saver.log_training_stats(stats)
+        # print('Training loss: '+str(np.mean(running_loss))+' Eval score: '+str(eval_acc))
+        self.model.train()   # put back into train mode
 
 
 if __name__ == '__main__':

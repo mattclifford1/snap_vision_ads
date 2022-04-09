@@ -1,41 +1,54 @@
 import os
 import torch
+import pandas as pd
 import warnings
-warnings.filterwarnings("ignore", category=UserWarning)   # porch warning we dont care about
+warnings.filterwarnings("ignore", category=UserWarning)   # torch warning we dont care about
 
+class train_saver:
+    def __init__(self, base_dir, model, lr, lr_decay, batch_size):
+        self.base_dir = base_dir
+        self.model_name = model.__class__.__name__
+        self.lr = lr
+        self.lr_decay = lr_decay
+        self.batch_size = batch_size
+        self.get_save_dir()
 
-def get_save_dir(base_dir, model, lr, lr_decay, batch_size):
-    model_name = model.__class__.__name__
-    dir = os.path.join(base_dir, model_name)
-    dir = dir +'_LR_'+str(lr)
-    dir = dir +'_decay_'+str(lr_decay)
-    dir = dir +'_BS_'+str(batch_size)
-    return dir
+    def get_save_dir(self):
+        dir = os.path.join(self.base_dir, self.model_name)
+        dir = dir +'_LR_'+str(self.lr)
+        dir = dir +'_decay_'+str(self.lr_decay)
+        self.dir = dir +'_BS_'+str(self.batch_size)
 
-def load_pretrained(model, base_dir, lr, lr_decay, batch_size):
-    dir = get_save_dir(base_dir, model, lr, lr_decay, batch_size)
-    if not os.path.isdir(dir):
-        os.mkdir(dir)
-        return 0
-    checkpoints = os.listdir(dir)
-    saves = []
-    for checkpoint in checkpoints:
-        name, ext = os.path.splitext(checkpoint)
-        try:
-            epoch = int(name)
-            saves.append(epoch)
-        except:
-            pass
-    if len(saves) > 0:
-        latest_epoch = max(saves)
-        weights_path = os.path.join(dir, str(latest_epoch)+'.pth')
-        model.load_state_dict(torch.load(weights_path))
-        print('Loaded pretrained model at epoch: '+str(latest_epoch))
-        return latest_epoch
-        # return 0
-    else:
-        return 0 #no pretrained found
+    def load_pretrained(self, model):
+        if not os.path.isdir(self.dir):
+            os.mkdir(self.dir)
+            return 0
+        checkpoints = os.listdir(self.dir)
+        saves = []
+        for checkpoint in checkpoints:
+            name, ext = os.path.splitext(checkpoint)
+            try:
+                epoch = int(name)
+                saves.append(epoch)
+            except:
+                pass
+        if len(saves) > 0:
+            latest_epoch = max(saves)
+            weights_path = os.path.join(self.dir, str(latest_epoch)+'.pth')
+            model.load_state_dict(torch.load(weights_path))
+            print('Loaded pretrained model at epoch: '+str(latest_epoch))
+            return latest_epoch
+        else:
+            return 0 #no pretrained found
 
-def save_model(base_dir, model, lr, lr_decay, batch_size, epoch):
-    dir = get_save_dir(base_dir, model, lr, lr_decay, batch_size)
-    torch.save(model.state_dict(), os.path.join(dir, str(epoch)+'.pth'))
+    def save_model(self, model, epoch):
+        torch.save(model.state_dict(), os.path.join(self.dir, str(epoch)+'.pth'))
+
+    def log_training_stats(self, stats_dicts):
+        df = pd.DataFrame(stats_dicts)
+        # load csv if there is one
+        file = os.path.join(self.dir, 'training_stats.csv')
+        if os.path.isfile(file):
+            df.to_csv(file, mode='a', index=False, header=False)
+        else:
+            df.to_csv(file, index=False)
