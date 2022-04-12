@@ -1,11 +1,15 @@
 # Data downloader
 to download dataset using python:
 ```
-import data.download
+data_dir = download.get_if_doesnt_exist(ARGS.dataset_dir)
 ```
 or from the command line:
 ```
-$ python download.py
+$ python data/download.py
+```
+# Data downscaler
+```
+data_dir = resize_dataset.run(data_dir, 512)
 ```
 
 # Large data file

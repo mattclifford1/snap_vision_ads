@@ -31,6 +31,7 @@ def run(features_csv='exploration/database.csv'):
 
     # eval features
     evaluation = compare_similar.eval(embeddings, labels)  # will print out accuracy
+    return evaluation.results
 
 
 if __name__ == '__main__':

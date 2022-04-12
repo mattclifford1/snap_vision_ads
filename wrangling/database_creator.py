@@ -7,11 +7,8 @@ from argparse import ArgumentParser
 def get_all_subdirs(dir):
     # check if data is downloaded
     if not os.path.isdir(dir):
-        # raise FileNotFoundError('No directory: '+dir+'. Please download and unzip the dataset')
-        import sys
-        sys.path.append('..')
-        sys.path.append('.')
-        import data.download
+        raise FileNotFoundError('No directory: '+dir+'. Please download and unzip the dataset')
+
     # find all the dirs
     dirs = glob.glob(os.path.join(dir, '**/'), recursive=True)
     dirs.pop(0)  # remove first one with is the base dir

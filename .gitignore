@@ -1,12 +1,17 @@
 # things to ignore .
 ./datasets
 uob_image_set
+uob_image_set*
 */uob_image_set
+*/uob_image_set*
 data/uob_image_set
 data/files_to_gitignore/*
 !data/files_to_gitignore/readme.md
 exploration/database.csv
 wrangling/image_paths*
+wrangling/image_paths_database_eval.csv
+wrangling/image_paths_database_train.csv
+
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
