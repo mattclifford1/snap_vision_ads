@@ -7,7 +7,7 @@ import ast
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from evaluation import compare_similar
+from evaluation import nearest_points
 
 
 def get_features_csv(features_csv='exploration/database.csv'):
@@ -32,7 +32,7 @@ def run(features_csv='exploration/database.csv'):
         embeddings.append(list(dict_row.values()))
     labels = list(df['label'])
     # eval features
-    evaluation = compare_similar.eval(embeddings, labels)  # will print out accuracy
+    evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
     return evaluation.results
 
 def get_embedding(image_path, features_csv='exploration/database.csv'):

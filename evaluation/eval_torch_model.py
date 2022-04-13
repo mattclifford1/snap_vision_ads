@@ -6,7 +6,7 @@ sys.path.append('.')
 sys.path.append('..')
 from data_loader.load import get_data
 from data_loader.augmentation import *
-from evaluation.compare_similar import eval
+from evaluation.nearest_points import eval
 from tqdm import tqdm
 
 

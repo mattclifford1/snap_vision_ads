@@ -56,23 +56,25 @@ class eval:
         return scores
 
     def get_score(self, i):
-        X_train = list(self.embeddings) # copy
-        y_train = list(self.labels) # copy
-        x_test = X_train.pop(i)
-        y_test = y_train.pop(i)
+        # X_train = list(self.embeddings) # copy
+        # y_train = list(self.labels) # copy
+        # x_test = X_train.pop(i)
+        # y_test = y_train.pop(i)
 
-        y_pred = get_knn_closest(X_train, y_train, [x_test], self.num_neighbours)
-        return [y_test] + y_pred
+        y_pred = get_knn_closest(self.embeddings, self.labels, [self.embeddings[i]], self.num_neighbours)
+        return [self.labels[i]] + y_pred
 
 
 def get_knn_closest(X_train, y_train, x_test, num_neighbours=5):
-    knn = KNeighborsClassifier(num_neighbours)
+    # if type(x_test[0]) != list:
+    #     x_test = list(x_test)
+    knn = KNeighborsClassifier(num_neighbours+1)
     knn.fit(X_train, y_train)
     closest_inds = knn.kneighbors(x_test, return_distance=False)[0]
     neighbours = []
     for ind in closest_inds:
         neighbours.append(y_train[ind])
-    return neighbours
+    return neighbours[1:]  # don't include x_test (is closest to itself)
 
 
 if __name__ == '__main__':

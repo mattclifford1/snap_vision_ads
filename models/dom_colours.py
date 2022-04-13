@@ -7,7 +7,7 @@ import ast
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from evaluation import compare_similar
+from evaluation import nearest_points
 
 from __future__ import print_function
 from skimage import io, color,filters
@@ -138,7 +138,7 @@ def run(features_csv='exploration/database.csv'):
     #  for second image j, check j+1:end
     # for all images, if distance <200, then add to similar images
     #  using embeddings
-    #  then run compare_similar.eval(embeddings,labels)
+    #  then run nearest_points.eval(embeddings,labels)
     #  maybe idk I aint a software engineer
 
 
@@ -154,7 +154,7 @@ def run(features_csv='exploration/database.csv'):
     # labels = list(df['label'])
 
     # # eval features
-    # evaluation = compare_similar.eval(embeddings, labels)  # will print out accuracy
+    # evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
 
 
 if __name__ == '__main__':

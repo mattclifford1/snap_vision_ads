@@ -8,8 +8,7 @@ from tqdm import tqdm
 
 
 def run(data_dir, im_size=512):
-    print('downscaling image dataset')
-    for dir in tqdm(os.listdir(data_dir)):
+    for dir in tqdm(os.listdir(data_dir), desc="Downscaling image dataset to: "+str(im_size), leave=False):
         orig_dir = os.path.join(data_dir, dir)
         new_dir = os.path.join(data_dir+str(im_size), dir)
         for im in os.listdir(orig_dir):

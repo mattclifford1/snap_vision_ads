@@ -1,22 +1,59 @@
 from argparse import ArgumentParser
 import os
+from tqdm import tqdm
+from skimage import io
 
 from data import download, resize_dataset
 from data_loader.load import get_database
 from wrangling.database_creator import contruct_database
 from models import simple, toy_network, network, FaceNet, utils
-from evaluation import eval_torch_model
+from evaluation import nearest_points
 
 
 def eval(model):
     # get the csv of the image paths of the evaluation database
     data = get_database(eval=True)
-    # loop over the evaluation database
-    for row in data:
-        im_path = row['image_path']
-        im_label = row['label']
+
+    # loop over the evaluation database to get the data we need for evaluation
+    data_results = {'image_paths': [],
+                    'labels': [],
+                    'embeddings': [],
+                    'closest': []}
+    for row in tqdm(data, desc="Getting Embeddings", leave=False):
+        data_results['image_paths'].append(row['image_path'])
+        data_results['labels'].append(row['label'])
         # get embedding for the image
-        embedding = model.get_embedding(im_path)
+        embedding = model.get_embedding(row['image_path'])
+        data_results['embeddings'].append(embedding)
+
+    # now find images of the closest embeddings
+    for i in tqdm(range(len(data_results['image_paths'])), desc="Getting knn closest embeddings", leave=False):
+        closest = nearest_points.get_knn_closest(data_results['embeddings'],
+                                                 data_results['image_paths'],
+                                                 [data_results['embeddings'][i]],
+                                                 num_neighbours=5)
+        data_results['closest'].append(closest)
+
+    # now do whatever you want with the images and their closest embeddings
+    count = 0
+    for i in tqdm(range(len(data_results['image_paths'])), desc="Evaluating closest embeddings", leave=False):
+        # read images from file
+        image_path = data_results['image_paths'][i]
+        image = io.imread(image_path)
+        closest = []
+        for closest_image__path in data_results['closest'][i]:
+            closest.append(io.imread(closest_image__path))
+        # now maybe plot the image and its closest?
+        # WRITE CODE HERE
+        #
+        #
+        #
+
+        # don't loop over the whole dataset whilst developing
+        if count > 10:
+            break
+        count += 1
+
 
 
 def run_pipeline(ARGS):
