@@ -11,7 +11,7 @@ exploration/database.csv
 wrangling/image_paths*
 wrangling/image_paths_database_eval.csv
 wrangling/image_paths_database_train.csv
-
+*.csv
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
