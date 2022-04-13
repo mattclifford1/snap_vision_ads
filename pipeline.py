@@ -53,11 +53,12 @@ def run_pipeline(ARGS):
 
     # run models
     if 'simple' in ARGS.models_list:
-        features_csv='exploration/database.csv'
-        if ARGS.redo_simple_features and os.path.isfile(features_csv):   # calcuate features from scratch rather than using cached
-            os.remove(features_csv)
+        simple_model_csv = os.path.join(ARGS.save_dir, 'simple_model.csv')
+        if os.path.isfile(simple_model_csv):   # calcuate features from scratch rather than using cached
+            os.remove(simple_model_csv)
         print('\nRunning simple model')
-        results = simple.run(features_csv)
+        simple_model = simple.model(simple_model_csv)
+        results = simple_model.run()
         print_results(results)
 
     if 'simple_net' in ARGS.models_list:
@@ -89,9 +90,8 @@ if __name__ == '__main__':
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("--dataset_stats", default=False, action='store_true', help='prints out some basic statistics about the dataset')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
-    parser.add_argument("--redo_simple_features", default=False, action='store_true', help='calculate simple image features from scratch rather than database look up')
     parser.add_argument("--train", default=False, action='store_true', help='option to train the neural network')
-    parser.add_argument("--save_dir", default='data/files_to_gitignore', help='Location to save models during training')
+    parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location to save models during training')
     parser.add_argument("--epochs", default=1, type=int, help='how many epochs to train for')
     parser.add_argument("--batch_size", default=16, type=int, help='batch size to use during training')
     parser.add_argument("-lr", "--learning_rate", default=0.001, type=float, help='learning rate to use during training')

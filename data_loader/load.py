@@ -35,7 +35,13 @@ class get_database:
         self.df[col_name] = data
 
     def save_df(self, save_file):
+        self.check_write_path(save_file)
         self.df.to_csv(save_file, index=False)
+
+    def check_write_path(self, path):
+        dir = os.path.dirname(path)
+        if not os.path.isdir(dir):
+            os.makedirs(dir)
 
     def __len__(self):
         return self.df.shape[0]
