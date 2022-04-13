@@ -102,8 +102,10 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
-    parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location to save models during training')
-    parser.add_argument("--batch_size", default=16, type=int, help='batch size to use during training')
+    parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location models were saved during training')
+    parser.add_argument("--batch_size", default=16, type=int, help='batch size used during training')
+    parser.add_argument("-lr", "--learning_rate", default=0.001, type=float, help='learning rate used during training')
+    parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay used during training')
     parser.add_argument("--checkpoint", default=None, help='pretained network weights to load')
     ARGS = parser.parse_args()
 
