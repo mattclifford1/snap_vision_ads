@@ -54,7 +54,7 @@ def run_pipeline(ARGS):
     # run models
     if 'simple' in ARGS.models_list:
         features_csv='exploration/database.csv'
-        if ARGS.redo_simple_features:   # calcuate features from scratch rather than using cached
+        if ARGS.redo_simple_features and os.path.isfile(features_csv):   # calcuate features from scratch rather than using cached
             os.remove(features_csv)
         print('\nRunning simple model')
         results = simple.run(features_csv)

@@ -11,8 +11,11 @@ from data_loader.augmentation import *
 
 
 class get_database:
-    def __init__(self, df_csv='wrangling/image_paths_database_train.csv'):
-        self.df_csv = df_csv
+    def __init__(self, eval=False):
+        if not eval:
+            self.df_csv = 'wrangling/image_paths_database_train.csv'
+        else:
+            self.df_csv = 'wrangling/image_paths_database_eval.csv'
         self.check_csv_exists()
         self.load_df()
 
