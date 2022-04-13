@@ -6,14 +6,15 @@ import errno
 
 
 class network(nn.Module):
-    def __init__(self, input_size=512, emb_dim=128):
+    def __init__(self):
         super(network, self).__init__()
+        self.input_size = 512
+        self.emb_dim = 128
 
         self.conv_size_1 = 16
         self.conv_size_2 = 32
         self.conv_size_3 = 64
         self.conv_size_4 = 128
-        self.input_size = input_size
         self.final_conv_dims = 28*28*self.conv_size_4
 
         self.conv1 = nn.Sequential(
@@ -39,10 +40,10 @@ class network(nn.Module):
 
 
         self.fc = nn.Sequential(
-            nn.Linear(self.final_conv_dims, emb_dim*2),
-            # nn.Linear(64*self.conv_final_dim*self.conv_final_dim, emb_dim*2),
+            nn.Linear(self.final_conv_dims, self.emb_dim*2),
+            # nn.Linear(64*self.conv_final_dim*self.conv_final_dim, self.emb_dim*2),
             nn.PReLU(),
-            nn.Linear(emb_dim*2, emb_dim)
+            nn.Linear(self.emb_dim*2, self.emb_dim)
         )
 
     def forward(self, x):

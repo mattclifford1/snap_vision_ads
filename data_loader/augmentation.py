@@ -77,7 +77,6 @@ if __name__ == '__main__':
     sample = training_data[65]
     for i, tsfrm in enumerate([scale, crop, composed]):
         transformed_sample = tsfrm(sample)
-
         ax = plt.subplot(3, 3, i*3 + 1)
         plt.imshow(transformed_sample['image'])
         ax.set_title('im '+ type(tsfrm).__name__)

@@ -10,9 +10,10 @@ from torchvision import transforms
 
 
 class FaceNetInception(nn.Module):
-    def __init__(self, input_size=224, emb_dim=128):
+    def __init__(self):
         super(FaceNetInception, self).__init__()
-        self.input_size = input_size
+        self.input_size = 224
+        self.emb_dim = 128
 
         self.conv1 = ConvBlock(3, 64, kernel_size=7, stride=2, padding=3)
         self.conv2 = ConvBlock(64, 192, kernel_size=3, stride=1, padding=1)
@@ -22,7 +23,7 @@ class FaceNetInception(nn.Module):
         self.norm = nn.functional.normalize
 
         self.dropout = nn.Dropout(0.4)
-        self.linear = nn.Linear(1024, emb_dim)
+        self.linear = nn.Linear(1024, self.emb_dim)
 
         self.inception3a = InceptionBlock(192, 64, 96, 128, 16, 32, 32)
         self.inception3b = InceptionBlock(256, 128, 128, 192, 32, 96, 64)

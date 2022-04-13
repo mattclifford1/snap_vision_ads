@@ -15,7 +15,7 @@ def print_results(results):
     print('Any closest embedding correct: '+str(results['in_any']*100))
 
 
-def train_network(model, input_size, ARGS):
+def train_network(model, ARGS):
     # print('Before training Evaluation (Random weights)')
     # results = eval_torch_model.run(model, batch_size=ARGS.batch_size)
     # print_results(results)
@@ -61,24 +61,18 @@ def run_pipeline(ARGS):
 
     if 'simple_net' in ARGS.models_list:
         print('\nRunning simple neural network with triplet loss')
-        input_size = 256
-        embedding_dims = 64
-        model = toy_network.toy_network(input_size, embedding_dims)
-        train_network(model, input_size, ARGS)
+        model = toy_network.toy_network()
+        train_network(model, ARGS)
 
     if 'big_net' in ARGS.models_list:
         print('\nRunning big neural network with triplet loss')
-        input_size = 512
-        embedding_dims = 128
-        model = network.network(input_size, embedding_dims)
-        train_network(model, input_size, ARGS)
+        model = network.network()
+        train_network(model, ARGS)
 
     if 'facenet' in ARGS.models_list:
         print('\nRunning FaceNetInception with triplet loss')
-        input_size = 224
-        embedding_dims = 128
-        model = FaceNet.FaceNetInception(input_size, embedding_dims)
-        train_network(model, input_size, ARGS)
+        model = FaceNet.FaceNetInception()
+        train_network(model, ARGS)
 
 
 if __name__ == '__main__':

@@ -59,5 +59,6 @@ class model:
 
 if __name__ == '__main__':
     # run()
-    embedding = get_embedding('data/uob_image_set512/13507603/13507603_2.jpg')
+    m = model('data/files_to_gitignore/models/simple_model.csv')
+    embedding = m.get_embedding('data/uob_image_set512/16288974/16288974_1.jpg')
     print(embedding)

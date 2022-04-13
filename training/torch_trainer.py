@@ -94,7 +94,7 @@ class trainer():
         anchor_img = sample['image'].to(device=self.device, dtype=torch.float)
         positive_img = sample['positive'].to(device=self.device, dtype=torch.float)
         negative_img = sample['negative'].to(device=self.device, dtype=torch.float)
-
+        
         # zero the parameter gradients
         self.optimiser.zero_grad()
 
