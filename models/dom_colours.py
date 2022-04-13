@@ -1,9 +1,14 @@
-# %%
-# %load_ext autoreload
+'''
+Simple model matching images with similar dominant colours
+'''
+import os
+import pandas as pd
+import ast
+import sys
+sys.path.append('.')
+sys.path.append('..')
+from evaluation import compare_similar
 
-# %autoreload 2
-
-# %%
 from __future__ import print_function
 from skimage import io, color,filters
 import numpy as np
@@ -21,44 +26,9 @@ from sklearn.cluster import KMeans
 from os import walk
 
 # %%
-from colour_utilities import get_dominant_colours, choose_tint_color, coloured_square
+from exploration.colour_utilities import get_dominant_colours, choose_tint_color, coloured_square
 
 
-
-set_ID = '11059585'
-photo_ID = '0'
-
-conc_ID = set_ID + '/' + set_ID + '_' + photo_ID + '.jpg'
-
-path = '../data/uob_image_set/'
-
-filename = os.path.join(path,conc_ID)
-# filename = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/data/uob_image_set/11059585/11059585_0.jpg'
-filename = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/data/uob_image_set/11059585/11059585_0.jpg'
-image = io.imread(filename)
-
-# %%
-n = 5
-
-# print(n,' : \n',image[n])
-# imshape = np.shape(image)
-
-# unique_colours = {'colour':[],'count':[]}
-
-# for i in tqdm(range(0,imshape[0])):
-#     for j in range(0,imshape[1]):
-#         col_array = list(image[i,j])
-#         if col_array in unique_colours['colour']:
-#             # print('match')
-#             unique_colours['count'][unique_colours['colour'].index(col_array)]+=1
-#         else:
-#             # print('new colour')
-#             unique_colours['colour'].append(col_array)
-#             unique_colours['count'].append(1)
-
-# %%
-#  create positive and negative examples
-# path | id | number | dom_colours | 
 set1 = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/data/uob_image_set/11059585'
 set2 = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/data/uob_image_set/11233998'
 set3 = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/data/uob_image_set/16013076'
@@ -151,43 +121,41 @@ for k in range(0,len(data['path'])):
         sum_dist = sum_dist + col_data[i][j]['distance']
     
     print("Total Distance: ", sum_dist)
-# cost = np.sum(A[scipy.optimize.linear_sum_assignment(A)])
-# test_pairs = KMeans(n_clusters=n).fit(A).cluster_centers_
-# squares = coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col))
-#         # print(squares)
 
-# # %%
-# if __name__ == "__main__":
-#     import sys
 
-#     try:
-#         path = sys.argv[1]
-#     except ImportError:
-#         sys.exit(f"Usage: {__file__} <PATH>")
+# def check_features(features_csv='exploration/database.csv'):
+#     # check features file exists (create if not)
+#     features_csv = 'exploration/database.csv'
+#     if not os.path.isfile(features_csv):
+#         from exploration import save_features
+#         save_features.save_simple_features(features_csv=features_csv)
 
-# #     # get 5 most dominant colours from an image
-# #     dominant_colors = get_dominant_colours(path, count=5)
+def run(features_csv='exploration/database.csv'):
 
-# #     lab_dom_col = []
-# #     for col in dominant_colors:
-# #         lab_dom_col.append(color.rgb2lab(col))
-# #         # squares = coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col))
-# #         # print(squares)
-    
-# #     # test against a set of images for now, one correct set, one different
-# #     #  for each image - assign dominant colours to minimise distance overall
-# #     #  need to set some kind of distance threshold which correctly associates good images removes bad
-# #     #  for now - just rank loss from min to max and see what IDs are
+    # for each image in database
+    # Check dominant colours against all other images 
+    #  for first image i, check i+1:end
+    #  for second image j, check j+1:end
+    # for all images, if distance <200, then add to similar images
+    #  using embeddings
+    #  then run compare_similar.eval(embeddings,labels)
+    #  maybe idk I aint a software engineer
 
-# #     color.deltaE_cie76()
-# #     # print(tint_color)
-#     # # print("#%02x%02x%02x" % tuple(int(v * 255) for v in tint_color))
-#     # for n in range(0,len(inds_A[0])):
-#     #     i = inds_A[0][n]
-#     #     j = inds_A[1][n]
-#     #     col = [col_data[i][j]['test_col_rgb'],col_data[i][j]['im_col_rgb']]
-        
-#     #     squares = [coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[0])),coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[1]))]
-#     #     print(squares,' | Distance: ',col_data[i][j]['distance'])
-# %%
-# %%
+
+    # check_features(features_csv)
+    # # load features
+    # df = pd.read_csv(features_csv)
+    # embeddings = []
+    # # get all features from dataframe
+    # for row in range(df.shape[0]):
+    #     # convert dict in str format to list of its values
+    #     dict_row = ast.literal_eval(df['features'][row])
+    #     embeddings.append(list(dict_row.values()))
+    # labels = list(df['label'])
+
+    # # eval features
+    # evaluation = compare_similar.eval(embeddings, labels)  # will print out accuracy
+
+
+if __name__ == '__main__':
+    run()
