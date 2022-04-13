@@ -14,7 +14,6 @@ class save_simple_features:
     def __init__(self, compute_sequencially=False,
                        features_csv='exploration/database.csv',
                        eval=True):
-        print('Making simple features')
         self.data = get_database(eval=eval)
         self.im_paths = []
         for row in self.data:
@@ -33,14 +32,14 @@ class save_simple_features:
 
     def run_sequentially(self):
         features = []
-        for i in tqdm(range(len(self.im_paths))):
+        for i in tqdm(range(len(self.im_paths)), desc="Making simple features", leave=False):
             features_dict = self.get_feats_func(i)
             features.append(features_dict)
         return features
 
     def run_parellel(self):
         pool_obj = multiprocessing.Pool()
-        features = list(tqdm(pool_obj.imap(self.get_feats_func, range(len(self.im_paths))), total=len(self.im_paths)))
+        features = list(tqdm(pool_obj.imap(self.get_feats_func, range(len(self.im_paths))), total=len(self.im_paths), desc="Making simple features", leave=False))
         return features
 
 

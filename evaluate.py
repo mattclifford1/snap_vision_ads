@@ -70,7 +70,9 @@ def run_pipeline(ARGS):
 
     # eval chosen models from input arguments
     if 'simple' in ARGS.models_list:
-        eval(simple)
+        simple_model = simple.model(os.path.join(ARGS.save_dir, 'simple_model.csv'))
+        results = simple_model.run()
+        eval(simple_model)
 
     # if 'simple_net' in ARGS.models_list:
     #     print('\nRunning simple neural network with triplet loss')
@@ -100,7 +102,7 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
-    parser.add_argument("--redo_simple_features", default=False, action='store_true', help='calculate simple image features from scratch rather than database look up')
+    parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location to save models during training')
     parser.add_argument("--batch_size", default=16, type=int, help='batch size to use during training')
     parser.add_argument("--checkpoint", default=None, help='pretained network weights to load')
     ARGS = parser.parse_args()
