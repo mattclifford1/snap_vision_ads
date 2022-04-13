@@ -3,24 +3,34 @@ The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual rep
 ![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 # Running the Pipeline
-To run the whole pipeline use:
+There are two pipelines to run, training and evaluation, make sure you have python set up with the correct packages installed before running by following the section below.
+## Training
+To run the pipeline in it's most basic form use:
 ```
 $ python pipeline.py
 ```
-To display the available command line arguments for the pipeline:
-
+There are many different options to train, such as what model type, where to save the trained models and various neural network training hyper parameters (if training neural network model type). You can display all of the available command line arguments for the pipeline by using the command:
 ```
 $ python pipeline.py --help
 ```
+### Neural Network Training
+To train a neural network it is advised to use a GPU (the default batch sizes are for a 24GB VRAM card so adjust accordingly to your hardware). The available network currently are: [simple_net](models/toy_network.py), [big_net](models/network.py) and [facenet](models/FaceNet.py). To train facenet for 100 epochs use:
+```
+$ python pipeline.py --models_list facenet --epochs 100 --batch_size 64 --learning_rate 0.0001 --save_dir data/files_to_gitignore/models
+```
+The model weights will be saved inside the `save_dir` along with training stats details. If a model doesn't finish training or you would like to train a model for longer after training then increase the epochs. Any previous model weights found which have identical training hyperparamters will be automatically loaded and training will continue where it was left. So make sure you delete any previous models if you want to re train from scratch!
 
-### Uselink links
- - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
- - [Kaggle triplet loss](https://www.kaggle.com/code/hirotaka0122/triplet-loss-with-pytorch/notebook)
- - [pytorch dataloader](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+## Evaluation
+To run the evaluation pipeline use:
+```
+$ python evaluate.py
+```
+You can specify different models with the `--models_list` command line argument for example:
+```
+$ python evaluate.py --models_list facenet --checkpoint latest
+```
+Will evaluate the [facenet](models/FaceNet.py) model with the latest training checkpoint. Change `latest` with the number at which epoch the weights are saved at if you wish to evaluate previous models.
 
-
-# Downloading the dataset
-Follow the instructions inside [data](./data) to download and unzip the dataset automatically using python.
 
 # Python Setup
 ## env with conda
@@ -40,3 +50,10 @@ $ conda install pytorch torchvision torchaudio cpuonly -c pytorch
 ```
 conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 ```
+# Downloading the dataset
+The pipeline will automatically download and unzip the dataset, as well as downscale the image resolution, but if you want to just download the dataset in isolation then follow the instructions inside [data](./data) to download and unzip the dataset automatically using python.
+
+# Uselink links
+- [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
+- [Kaggle triplet loss](https://www.kaggle.com/code/hirotaka0122/triplet-loss-with-pytorch/notebook)
+- [pytorch dataloader](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)

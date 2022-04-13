@@ -18,6 +18,7 @@ def get_features_csv(features_csv):
     df = pd.read_csv(features_csv)
     return df
 
+
 class model:
     def __init__(self, csv_file):
         self.features_csv = csv_file
@@ -40,6 +41,9 @@ class model:
         return evaluation.results
 
     def get_embedding(self, image_path):
+        '''
+        get embedding of a single image
+        '''
         # load features
         row = self.df[self.df['image_path'] == image_path].index
         if len(row) == 0:
