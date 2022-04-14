@@ -68,6 +68,10 @@ def run_pipeline(ARGS):
     # contruct database from uob_image_set dataset
     contruct_database(data_dir)
 
+    # download network weights if required
+    if ARGS.download_weights:
+        download._download_and_unzip(ARGS.save_dir, ARGS.weights_url)
+
     # eval chosen models from input arguments
     if 'simple' in ARGS.models_list:
         simple_model = simple.model(os.path.join(ARGS.save_dir, 'simple_model.csv'))
@@ -100,6 +104,8 @@ if __name__ == '__main__':
     parser.add_argument("-lr", "--learning_rate", default=0.001, type=float, help='learning rate used during training')
     parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay used during training')
     parser.add_argument("--checkpoint", default='latest', help='epoch of pretained network weights to load')
+    parser.add_argument("--download_weights", default=False, action='store_true', help='download network weights')
+    parser.add_argument("--weights_url", default='https://drive.google.com/u/0/uc?id=1--XVjm3VGkMg450MC3jG3qGGCpHcP_ct&export=download&confirm=t', help='url of network weights to download')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)
