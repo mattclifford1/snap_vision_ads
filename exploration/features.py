@@ -22,6 +22,7 @@ def get_features(filename):
 
 
 if __name__ == '__main__':
+    print('Testing features')
     # get data loader
     import sys
     sys.path.append('..')
@@ -29,4 +30,14 @@ if __name__ == '__main__':
     from data_loader.load import get_database
     data = get_database()
     # test get_features
-    print(get_features(data[0]['image_path']))
+    features = get_features(data[0]['image_path'])
+    print('Features are: ', features)
+    for key in features.keys():
+        feature_type = type(features[key])
+        if feature_type in [float, int]:
+            pass
+        elif np.issubdtype(feature_type, np.number):
+            pass
+        else:
+            raise Exception('Feature \'' +str(key)+'\' must be int, float or np.number not '+str(feature_type))
+    print('Features will work with the simple model :)')
