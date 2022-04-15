@@ -3,7 +3,7 @@ The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual rep
 ![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 # Running the Pipeline
-There are two pipelines to run, training and evaluation, make sure you have python set up with the correct packages installed before running by following the section below.
+There are two pipelines to run, training and evaluation, make sure you have python set up with the correct packages installed before running by following the section below. If it is the first time running the pipeline it may take a little longer to run as the dataset download and rescaling will need to be done, but these are both stored locally inside [data](data), ready for future pipeline runs.
 ## Training
 To run the pipeline in it's most basic form use:
 ```
@@ -27,9 +27,19 @@ $ python evaluate.py
 ```
 You can specify different models with the `--models_list` command line argument for example:
 ```
-$ python evaluate.py --models_list facenet --checkpoint latest
+$ python evaluate.py --models_list facenet
 ```
-Will evaluate the [facenet](models/FaceNet.py) model with the latest training checkpoint. Change `latest` with the number at which epoch the weights are saved at if you wish to evaluate previous models.
+Will evaluate the [facenet](models/FaceNet.py) model with the latest training checkpoint.
+### Download model weights from the cloud
+If you don't have the model's weights stored locally, the download them from the cloud using:
+```
+$ python evaluate.py --models_list simple_net --download_weights
+```
+Which downloads the default simple neural network model. Use the `---weights_url` argument to change to a different model's storage location on the cloud. Model's must come in a zipped format.
+
+### Load earlier checkpoints
+Use the `--checkpoint` argument with the number at which epoch the weights are saved at if you wish to evaluate previous models.
+
 
 
 # Python Setup

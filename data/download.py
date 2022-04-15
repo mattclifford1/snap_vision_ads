@@ -9,7 +9,7 @@ def _download_and_unzip(extraction_dir='data',
         os.mkdir(extraction_dir)
 
     # unzip
-    print('\nUnzipping into directory: ', extraction_dir)
+    print('\nUnzipping'+str(zip_file)+' into directory: ', extraction_dir)
 
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
         zip_ref.extractall(extraction_dir)

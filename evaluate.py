@@ -70,6 +70,7 @@ def run_pipeline(ARGS):
 
     # download network weights if required
     if ARGS.download_weights:
+        print('Download model weights')
         download._download_and_unzip(ARGS.save_dir, ARGS.weights_url)
 
     # eval chosen models from input arguments
@@ -99,13 +100,15 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
+    # select model weights (if neural network model)
     parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location models were saved during training')
-    parser.add_argument("--batch_size", default=16, type=int, help='batch size used during training')
-    parser.add_argument("-lr", "--learning_rate", default=0.001, type=float, help='learning rate used during training')
-    parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay used during training')
     parser.add_argument("--checkpoint", default='latest', help='epoch of pretained network weights to load')
     parser.add_argument("--download_weights", default=False, action='store_true', help='download network weights')
-    parser.add_argument("--weights_url", default='https://drive.google.com/u/0/uc?id=1--XVjm3VGkMg450MC3jG3qGGCpHcP_ct&export=download&confirm=t', help='url of network weights to download')
+    parser.add_argument("--weights_url", default='https://drive.google.com/u/0/uc?id=1bTp1vVcAyi4dhTxr_WGKPqTVPrTIM0gB&export=download&confirm=t', help='url of network weights to download')
+    # training params are to know which model to load
+    parser.add_argument("--batch_size", default=64, type=int, help='batch size used during training')
+    parser.add_argument("-lr", "--learning_rate", default=0.0001, type=float, help='learning rate used during training')
+    parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay used during training')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)

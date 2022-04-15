@@ -83,9 +83,9 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_stats", default=False, action='store_true', help='prints out some basic statistics about the dataset')
     parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
     parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location to save models during training')
-    parser.add_argument("--epochs", default=1, type=int, help='how many epochs to train for')
-    parser.add_argument("--batch_size", default=16, type=int, help='batch size to use during training')
-    parser.add_argument("-lr", "--learning_rate", default=0.001, type=float, help='learning rate to use during training')
+    parser.add_argument("--epochs", default=50, type=int, help='how many epochs to train for')
+    parser.add_argument("--batch_size", default=64, type=int, help='batch size to use during training')
+    parser.add_argument("-lr", "--learning_rate", default=0.0001, type=float, help='learning rate to use during training')
     parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay to use during training')
     ARGS = parser.parse_args()
 
