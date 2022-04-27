@@ -73,7 +73,7 @@ def eval(model):
         if row_count >= image_rows:
             plt.show()
             row_count = 1
-            break ## REMOVE THIS TO SHOW MULTIPLE BATCHES OF IMAGES
+            # break ## REMOVE THIS TO SHOW MULTIPLE BATCHES OF IMAGES
             fig = plt.figure()
         else:
             row_count += 1
