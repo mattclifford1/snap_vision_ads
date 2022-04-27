@@ -56,19 +56,29 @@ def eval(model, ARGS):
         image_path = data_results['image_paths'][i]
         closest_paths = data_results['closest'][i]
         plot_closest(image_path, closest_paths, row_count, ARGS.num_disp, count)
-        if (row_count-1) > ARGS.num_disp:
-            print('in')
-            plt.show()
+        if row_count >= ARGS.num_disp:
+            if ARGS.save_fig:
+                save_dir = os.path.join('data', 'files_to_gitignore', 'eval_figs', str(ARGS.model)+str(ARGS.show_case))
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                save_file = os.path.join(save_dir, str(count)+'.png')
+                plt.savefig(save_file)
+            else:
+                plt.show()
             row_count = 1
             # break ## REMOVE THIS TO SHOW MULTIPLE BATCHES OF IMAGES
             fig = plt.figure(figsize=(pic_size*ARGS.num_neighbours, pic_size*ARGS.num_disp))
         else:
-            if not ARGS.save_fig: # use all when saving fig
-                row_count += 1
+            row_count += 1
+    # final fig
     if ARGS.save_fig:
-        save_dir = os.path.join('data', 'files_to_gitignore')
-        save_file = os.path.join(save_dir, str(ARGS.model)+str(ARGS.show_case)+'.png')
+        save_dir = os.path.join('data', 'files_to_gitignore', 'eval_figs', str(ARGS.model)+str(ARGS.show_case))
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        save_file = os.path.join(save_dir, str(count)+'.png')
         plt.savefig(save_file)
+    else:
+        plt.show()
 
 
 def run_pipeline(ARGS):

@@ -43,9 +43,9 @@ By default only one image with its closest embeddings is shown, to increase it u
 ```
 $ python evaluate.py --num_disp 10
 ```
-To save all eval examples to an image file use:
+To save all eval examples to an image file at `data/files_to_gitignore/eval_figs` use:
 ```
-$ python evaluate.py --save_fig
+$ python evaluate.py --num_disp 100 --save_fig
 ```
 By default 5 of the closest embeddings are shown, to change it use:
 ```
