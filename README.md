@@ -25,9 +25,9 @@ To run the evaluation pipeline to display the closest embeddings use:
 ```
 $ python evaluate.py
 ```
-You can specify different models with the `--models_list` command line argument for example:
+You can specify different models with the `--model` command line argument for example:
 ```
-$ python evaluate.py --models_list simple_net
+$ python evaluate.py --model simple_net
 ```
 Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
 ### Extra options
@@ -43,10 +43,18 @@ By default only one image with its closest embeddings is shown, to increase it u
 ```
 $ python evaluate.py --num_disp 10
 ```
+To save all eval examples to an image file use:
+```
+$ python evaluate.py --save_fig
+```
+By default 5 of the closest embeddings are shown, to change it use:
+```
+$ python evaluate.py --num_neighbours 7
+```
 ### Download model weights from the cloud
 If you don't have the model's weights stored locally, the download them from the cloud using:
 ```
-$ python evaluate.py --models_list simple_net --download_weights
+$ python evaluate.py --model simple_net --download_weights
 ```
 Which downloads the default simple neural network model. Use the `---weights_url` argument to change to a different model's storage location on the cloud. Model's must come in a zipped format.
 
