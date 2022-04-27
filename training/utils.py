@@ -35,7 +35,7 @@ class train_saver:
         if len(saves) > 0:
             latest_epoch = max(saves)
             weights_path = os.path.join(self.dir, str(latest_epoch)+'.pth')
-            model.load_state_dict(torch.load(weights_path))
+            model.load_state_dict(torch.load(weights_path, map_location=torch.device("cuda" if torch.cuda.is_available() else "cpu")))
             print('Loaded pretrained model at epoch: '+str(latest_epoch))
             return latest_epoch
         else:
