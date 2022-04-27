@@ -2,12 +2,39 @@ from argparse import ArgumentParser
 import os
 from tqdm import tqdm
 from skimage import io
+import matplotlib.pyplot as plt
 
 from data import download, resize_dataset
 from data_loader.load import get_database
 from wrangling.database_creator import contruct_database
 from models import simple, toy_network, network, FaceNet, neural_network
 from evaluation import nearest_points
+
+
+def plot_closest(image_path, closest_paths, row, rows):
+    # read images
+    image = io.imread(image_path)
+    closest = []
+    for closest_image__path in closest_paths:
+        closest.append(io.imread(closest_image__path))
+
+    # now plot the image and its closest
+    row_num = (row-1)*(len(closest_paths)+1)
+    ax = plt.subplot(rows, len(closest_paths)+1, row_num+1)
+    plt.imshow(image)
+    if row == True:
+        ax.set_title('Input Image')
+    plt.yticks([])
+    plt.xticks([])
+    count = 1
+    for close_im in closest:
+        ax = plt.subplot(rows, len(closest_paths)+1, row_num+count+1)
+        plt.imshow(close_im)
+        if row == True:
+            ax.set_title(str(count))
+        plt.yticks([])
+        plt.xticks([])
+        count += 1
 
 
 def eval(model):
@@ -35,24 +62,21 @@ def eval(model):
         data_results['closest'].append(closest)
 
     # now do whatever you want with the images and their closest embeddings
-    count = 0
+    row_count = 1
+    image_rows = 10
+    fig = plt.figure()
     for i in tqdm(range(len(data_results['image_paths'])), desc="Evaluating closest embeddings", leave=False):
         # read images from file
         image_path = data_results['image_paths'][i]
-        image = io.imread(image_path)
-        closest = []
-        for closest_image__path in data_results['closest'][i]:
-            closest.append(io.imread(closest_image__path))
-        # now maybe plot the image and its closest?
-        # WRITE CODE HERE
-        #
-        #
-        #
-
-        # don't loop over the whole dataset whilst developing
-        if count > 10:
-            break
-        count += 1
+        closest_paths = data_results['closest'][i]
+        plot_closest(image_path, closest_paths, row_count, image_rows)
+        if row_count >= image_rows:
+            plt.show()
+            row_count = 1
+            break ## REMOVE THIS TO SHOW MULTIPLE BATCHES OF IMAGES
+            fig = plt.figure()
+        else:
+            row_count += 1
 
 
 
