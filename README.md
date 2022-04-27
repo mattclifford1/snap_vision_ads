@@ -21,15 +21,28 @@ $ python pipeline.py --models_list facenet --epochs 100 --batch_size 64 --learni
 The model weights will be saved inside the `save_dir` along with training stats details. If a model doesn't finish training or you would like to train a model for longer after training then increase the epochs. Any previous model weights found which have identical training hyperparamters will be automatically loaded and training will continue where it was left. So make sure you delete any previous models if you want to re train from scratch!
 
 ## Evaluation
-To run the evaluation pipeline use:
+To run the evaluation pipeline to display the closest embeddings use:
 ```
 $ python evaluate.py
 ```
 You can specify different models with the `--models_list` command line argument for example:
 ```
-$ python evaluate.py --models_list facenet
+$ python evaluate.py --models_list simple_net
 ```
-Will evaluate the [facenet](models/FaceNet.py) model with the latest training checkpoint.
+Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
+### Extra options
+By default all images from the eval set are show, to just show cases where the closest embeddings contain a correct similar image use:
+```
+$ python evaluate.py --show_case pass
+```
+or only where the closest embeddings dont contain a similar image:
+```
+$ python evaluate.py --show_case fail
+```
+By default only one image with its closest embeddings is shown, to increase it use:
+```
+$ python evaluate.py --num_disp 10
+```
 ### Download model weights from the cloud
 If you don't have the model's weights stored locally, the download them from the cloud using:
 ```
