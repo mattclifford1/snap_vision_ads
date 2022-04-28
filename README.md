@@ -29,6 +29,7 @@ You can specify different models with the `--model` command line argument for ex
 ```
 $ python evaluate.py --model simple_net
 ```
+Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
 ### Example Closest embeddings from simple_net
 ![Alt text](misc/eg1.png?raw=true "Data Pipeline")
 ![Alt text](misc/eg2.png?raw=true "Data Pipeline")
@@ -42,7 +43,6 @@ $ python evaluate.py --model simple_net
 ![Alt text](misc/eg10.png?raw=true "Data Pipeline")
 ![Alt text](misc/eg11.png?raw=true "Data Pipeline")
 ![Alt text](misc/eg12.png?raw=true "Data Pipeline")
-Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
 ### Extra options
 By default all images from the eval set are show, to just show cases where the closest embeddings contain a correct similar image use:
 ```
