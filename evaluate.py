@@ -62,7 +62,7 @@ def eval(model, ARGS):
                 if not os.path.exists(save_dir):
                     os.makedirs(save_dir)
                 save_file = os.path.join(save_dir, str(count)+'.png')
-                plt.savefig(save_file)
+                plt.savefig(save_file, bbox_inches='tight')
             else:
                 plt.show()
             row_count = 1
@@ -76,7 +76,7 @@ def eval(model, ARGS):
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         save_file = os.path.join(save_dir, str(count)+'.png')
-        plt.savefig(save_file)
+        plt.savefig(save_file, bbox_inches='tight')
     else:
         plt.show()
 
