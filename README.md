@@ -64,6 +64,8 @@ By default 5 of the closest embeddings are shown, to change it use:
 ```
 $ python evaluate.py --num_neighbours 7
 ```
+### View all evaluations
+images of all embeddings from simple and simple_net model can be found [evaluation/eval_figs](evaluation/eval_figs)
 ### Download model weights from the cloud
 If you don't have the model's weights stored locally, the download them from the cloud using:
 ```
