@@ -1,6 +1,6 @@
 # Snap Vision Data Pipeline
 The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
-![Alt text](snap-vision-data-pipeline.png?raw=true "Data Pipeline")
+![Alt text](misc/snap-vision-data-pipeline.png?raw=true "Data Pipeline")
 
 # Running the Pipeline
 There are two pipelines to run, training and evaluation, make sure you have python set up with the correct packages installed before running by following the section below. If it is the first time running the pipeline it may take a little longer to run as the dataset download and rescaling will need to be done, but these are both stored locally inside [data](data), ready for future pipeline runs.
@@ -29,6 +29,19 @@ You can specify different models with the `--model` command line argument for ex
 ```
 $ python evaluate.py --model simple_net
 ```
+### Example Closest embeddings from simple_net
+![Alt text](misc/eg1.png?raw=true "Data Pipeline")
+![Alt text](misc/eg2.png?raw=true "Data Pipeline")
+![Alt text](misc/eg3.png?raw=true "Data Pipeline")
+![Alt text](misc/eg4.png?raw=true "Data Pipeline")
+![Alt text](misc/eg5.png?raw=true "Data Pipeline")
+![Alt text](misc/eg6.png?raw=true "Data Pipeline")
+![Alt text](misc/eg7.png?raw=true "Data Pipeline")
+![Alt text](misc/eg8.png?raw=true "Data Pipeline")
+![Alt text](misc/eg9.png?raw=true "Data Pipeline")
+![Alt text](misc/eg10.png?raw=true "Data Pipeline")
+![Alt text](misc/eg11.png?raw=true "Data Pipeline")
+![Alt text](misc/eg12.png?raw=true "Data Pipeline")
 Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
 ### Extra options
 By default all images from the eval set are show, to just show cases where the closest embeddings contain a correct similar image use:
