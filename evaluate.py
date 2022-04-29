@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 import os
 from tqdm import tqdm
-from skimage import io
 import matplotlib.pyplot as plt
 
 from data import download, resize_dataset
@@ -9,35 +8,9 @@ from data_loader.load import get_database
 from wrangling.database_creator import contruct_database
 from models import simple, toy_network, network, FaceNet, neural_network
 from evaluation import nearest_points
+from utils import get_label, plot_closest
 
-
-def plot_closest(image_path, closest_paths, row, rows):
-    # read images
-    image = io.imread(image_path)
-    closest = []
-    for closest_image__path in closest_paths:
-        closest.append(io.imread(closest_image__path))
-
-    # now plot the image and its closest
-    row_num = (row-1)*(len(closest_paths)+1)
-    ax = plt.subplot(rows, len(closest_paths)+1, row_num+1)
-    plt.imshow(image)
-    if row == True:
-        ax.set_title('Input Image')
-    plt.yticks([])
-    plt.xticks([])
-    count = 1
-    for close_im in closest:
-        ax = plt.subplot(rows, len(closest_paths)+1, row_num+count+1)
-        plt.imshow(close_im)
-        if row == True:
-            ax.set_title(str(count))
-        plt.yticks([])
-        plt.xticks([])
-        count += 1
-
-
-def eval(model):
+def eval(model, ARGS):
     # get the csv of the image paths of the evaluation database
     data = get_database(eval=True)
 
@@ -45,7 +18,8 @@ def eval(model):
     data_results = {'image_paths': [],
                     'labels': [],
                     'embeddings': [],
-                    'closest': []}
+                    'closest': [],
+                    'closest_labels': []}
     for row in tqdm(data, desc="Getting Embeddings", leave=False):
         data_results['image_paths'].append(row['image_path'])
         data_results['labels'].append(row['label'])
@@ -58,26 +32,53 @@ def eval(model):
         closest = nearest_points.get_knn_closest(data_results['embeddings'],
                                                  data_results['image_paths'],
                                                  [data_results['embeddings'][i]],
-                                                 num_neighbours=5)
+                                                 num_neighbours=ARGS.num_neighbours)
+        closest_labels = [get_label(x) for x in closest]
+
         data_results['closest'].append(closest)
+        data_results['closest_labels'].append(closest_labels)
 
     # now do whatever you want with the images and their closest embeddings
     row_count = 1
-    image_rows = 10
-    fig = plt.figure()
+    count = 0
+    pic_size = 1
+    fig = plt.figure(figsize=(pic_size*ARGS.num_neighbours, pic_size*ARGS.num_disp))
     for i in tqdm(range(len(data_results['image_paths'])), desc="Evaluating closest embeddings", leave=False):
-        # read images from file
+        count += 1
+        # deterime if this embedding has passed or failed on labels
+        if data_results['labels'][i] in data_results['closest_labels'][i]: # passed
+            if 'pass' not in ARGS.show_case:
+                continue
+        else:
+            if 'fail' not in ARGS.show_case:
+                continue
+
         image_path = data_results['image_paths'][i]
         closest_paths = data_results['closest'][i]
-        plot_closest(image_path, closest_paths, row_count, image_rows)
-        if row_count >= image_rows:
-            plt.show()
+        plot_closest(image_path, closest_paths, row_count, ARGS.num_disp, count)
+        if row_count >= ARGS.num_disp:
+            if ARGS.save_fig:
+                save_dir = os.path.join('data', 'files_to_gitignore', 'eval_figs', str(ARGS.model)+str(ARGS.show_case))
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                save_file = os.path.join(save_dir, str(count)+'.png')
+                plt.savefig(save_file, bbox_inches='tight')
+            else:
+                plt.show()
             row_count = 1
             # break ## REMOVE THIS TO SHOW MULTIPLE BATCHES OF IMAGES
-            fig = plt.figure()
+            fig = plt.figure(figsize=(pic_size*ARGS.num_neighbours, pic_size*ARGS.num_disp))
         else:
             row_count += 1
-
+    # final fig
+    if ARGS.save_fig:
+        save_dir = os.path.join('data', 'files_to_gitignore', 'eval_figs', str(ARGS.model)+str(ARGS.show_case))
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        save_file = os.path.join(save_dir, str(count)+'.png')
+        plt.savefig(save_file, bbox_inches='tight')
+    else:
+        plt.show()
 
 
 def run_pipeline(ARGS):
@@ -98,24 +99,24 @@ def run_pipeline(ARGS):
         download._download_and_unzip(ARGS.save_dir, ARGS.weights_url)
 
     # eval chosen models from input arguments
-    if 'simple' in ARGS.models_list:
+    if 'simple' == ARGS.model:
         simple_model = simple.model(os.path.join(ARGS.save_dir, 'simple_model.csv'))
-        eval(simple_model)
+        eval(simple_model, ARGS)
 
-    if 'simple_net' in ARGS.models_list:
+    elif 'simple_net' == ARGS.model:
         model = toy_network.toy_network()
         net_model = neural_network.run_net(ARGS.save_dir, model, ARGS.learning_rate, ARGS.lr_decay, ARGS.batch_size, ARGS.checkpoint)
-        eval(net_model)
+        eval(net_model, ARGS)
 
-    if 'big_net' in ARGS.models_list:
+    elif 'big_net' == ARGS.model:
         model = network.network()
         net_model = neural_network.run_net(ARGS.save_dir, model, ARGS.learning_rate, ARGS.lr_decay, ARGS.batch_size, ARGS.checkpoint)
-        eval(net_model)
+        eval(net_model, ARGS)
 
-    if 'facenet' in ARGS.models_list:
+    elif 'facenet' == ARGS.model:
         model = FaceNet.FaceNetInception()
         net_model = neural_network.run_net(ARGS.save_dir, model, ARGS.learning_rate, ARGS.lr_decay, ARGS.batch_size, ARGS.checkpoint)
-        eval(net_model)
+        eval(net_model, ARGS)
 
 
 if __name__ == '__main__':
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Data pipeline for training and evaluating image embeddings')
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
-    parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
+    parser.add_argument("-m", "--model", type=str, default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='models to use')
     # select model weights (if neural network model)
     parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location models were saved during training')
     parser.add_argument("--checkpoint", default='latest', help='epoch of pretained network weights to load')
@@ -133,6 +134,11 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", default=64, type=int, help='batch size used during training')
     parser.add_argument("-lr", "--learning_rate", default=0.0001, type=float, help='learning rate used during training')
     parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay used during training')
+    # what type of results to show
+    parser.add_argument("-sc", "--show_case", nargs="+", default=['pass', 'fail'], choices=['pass', 'fail'], help='list of eval types to display')
+    parser.add_argument("--num_disp", default=1, type=int, help='number of eval example to display at once')
+    parser.add_argument("--num_neighbours", default=5, type=int, help='number of closest neighbours to display')
+    parser.add_argument("--save_fig", default=False, action='store_true', help='save figure of closest embeddings to file')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)
