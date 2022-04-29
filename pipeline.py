@@ -38,6 +38,7 @@ def run_pipeline(ARGS):
 
     # download and upzip dataset if not found
     data_dir = download.get_if_doesnt_exist(ARGS.dataset_dir)
+
     # downscale the dataset if required
     if not ARGS.big_ims:
         data_dir = resize_dataset.run(data_dir, 512)
@@ -55,7 +56,12 @@ def run_pipeline(ARGS):
         if os.path.isfile(simple_model_csv):   # calcuate features from scratch rather than using cached
             os.remove(simple_model_csv)
         print('\nRunning simple model')
-        simple_model = simple.model(simple_model_csv)
+        
+        # mask images 
+        if ARGS.apply_mask:
+            simple_model = simple.model(simple_model_csv, apply_mask=True)
+        else:
+            simple_model = simple.model(simple_model_csv)
         results = simple_model.run()
         print_results(results)
 
@@ -87,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", default=64, type=int, help='batch size to use during training')
     parser.add_argument("-lr", "--learning_rate", default=0.0001, type=float, help='learning rate to use during training')
     parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay to use during training')
+    parser.add_argument("--apply_mask", default = False, help='option to mask images to remove background (experimental)')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)
