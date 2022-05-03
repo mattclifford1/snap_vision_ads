@@ -3,6 +3,7 @@
 
 # %autoreload 2
 
+
 # %%
 from __future__ import print_function
 from skimage import io, color,filters
@@ -20,10 +21,13 @@ import scipy.cluster
 from sklearn.cluster import KMeans
 from os import walk
 
+# Nasty workaround for running from subdirectory
+import sys
+sys.path.insert(0,sys.path[0][0:sys.path[0].rfind('/')])
+
 # %%
-from colour_utilities import get_dominant_colours, choose_tint_color, coloured_square
-
-
+from exploration.colour_utilities import get_dominant_colours, choose_tint_color, coloured_square
+# from .exploration import colour_utilities
 
 set_ID = '11059585'
 photo_ID = '0'
@@ -38,23 +42,7 @@ filename = '/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_
 image = io.imread(filename)
 
 # %%
-n = 5
-
-# print(n,' : \n',image[n])
-# imshape = np.shape(image)
-
-# unique_colours = {'colour':[],'count':[]}
-
-# for i in tqdm(range(0,imshape[0])):
-#     for j in range(0,imshape[1]):
-#         col_array = list(image[i,j])
-#         if col_array in unique_colours['colour']:
-#             # print('match')
-#             unique_colours['count'][unique_colours['colour'].index(col_array)]+=1
-#         else:
-#             # print('new colour')
-#             unique_colours['colour'].append(col_array)
-#             unique_colours['count'].append(1)
+n = 10
 
 # %%
 #  create positive and negative examples
@@ -83,11 +71,13 @@ for set in sets:
         im_path = set+'/'+im
         data['path'].append(im_path)
 
-        dominant_colors = get_dominant_colours(im_path, count=5)
+        dominant_colors = get_dominant_colours(im_path, count=n)
 
         lab_dom_col = []
         for col in dominant_colors:
             lab_dom_col.append(color.rgb2lab(col))
+            
+            print(np.dtype(lab_dom_col.tolist()))
         
         data['dom_colours_rgb'].append(dominant_colors)
         data['dom_colours_lab'].append(lab_dom_col)
@@ -100,7 +90,7 @@ for k in range(0,len(data['path'])):
     comp_im = {'path':data['path'][k],
               'dom_colours_rgb':data['dom_colours_rgb'][k],
               'dom_colours_lab':data['dom_colours_lab'][k]}
-    A = np.zeros([5,5])
+    A = np.zeros([n,n])
 
     i = 0
     j = 0
@@ -121,28 +111,14 @@ for k in range(0,len(data['path'])):
             A[t,c] = color.deltaE_cie76(comp_im['dom_colours_lab'][c],
                                         test_image['dom_colours_lab'][t])
         col_data.append(row_data)
-        # create matrix of similarities
-        # test im | image col 1, 2, 3, 4, 5  |
-        #   1     |   1-1, 1-2, 1-3, 1-4, 1-5
-        #   2     |   2-1, 2-2, 2-3, 2-4, 2-5
-        #   3     |   3-1, 3-2, 3-3, 3-4, 3-5
-        #   4     |   4-1, 4-2, 4-3, 4-4, 4-5
-        #   5     |   5-1, 5-2, 5-3, 5-4, 5-5
-    # %%
+
     inds_A = scipy.optimize.linear_sum_assignment(A)
 
-    # %%
-
-    # for i in inds_A[0]:
-    #     for j in inds_A[1]:
-    #         col = [col_data[i][j]['test_col_rgb'],col_data[i][j]['im_col_rgb']]
-    #         squares = coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[0]))
-    #         print(squares,' | Distance: ',col_data[i][j]['distance'])
     print("Image ",str(k))
     sum_dist = 0
-    for n in range(0,len(inds_A[0])):
-        i = inds_A[0][n]
-        j = inds_A[1][n]
+    for n_A in range(0,len(inds_A[0])):
+        i = inds_A[0][n_A]
+        j = inds_A[1][n_A]
         col = [col_data[i][j]['test_col_rgb'],col_data[i][j]['im_col_rgb']]
         
         squares = [coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[0])),coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[1]))]
@@ -151,43 +127,4 @@ for k in range(0,len(data['path'])):
         sum_dist = sum_dist + col_data[i][j]['distance']
     
     print("Total Distance: ", sum_dist)
-# cost = np.sum(A[scipy.optimize.linear_sum_assignment(A)])
-# test_pairs = KMeans(n_clusters=n).fit(A).cluster_centers_
-# squares = coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col))
-#         # print(squares)
 
-# # %%
-# if __name__ == "__main__":
-#     import sys
-
-#     try:
-#         path = sys.argv[1]
-#     except ImportError:
-#         sys.exit(f"Usage: {__file__} <PATH>")
-
-# #     # get 5 most dominant colours from an image
-# #     dominant_colors = get_dominant_colours(path, count=5)
-
-# #     lab_dom_col = []
-# #     for col in dominant_colors:
-# #         lab_dom_col.append(color.rgb2lab(col))
-# #         # squares = coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col))
-# #         # print(squares)
-    
-# #     # test against a set of images for now, one correct set, one different
-# #     #  for each image - assign dominant colours to minimise distance overall
-# #     #  need to set some kind of distance threshold which correctly associates good images removes bad
-# #     #  for now - just rank loss from min to max and see what IDs are
-
-# #     color.deltaE_cie76()
-# #     # print(tint_color)
-#     # # print("#%02x%02x%02x" % tuple(int(v * 255) for v in tint_color))
-#     # for n in range(0,len(inds_A[0])):
-#     #     i = inds_A[0][n]
-#     #     j = inds_A[1][n]
-#     #     col = [col_data[i][j]['test_col_rgb'],col_data[i][j]['im_col_rgb']]
-        
-#     #     squares = [coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[0])),coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[1]))]
-#     #     print(squares,' | Distance: ',col_data[i][j]['distance'])
-# %%
-# %%
