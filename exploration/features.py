@@ -3,11 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.transform import resize
 from skimage import io
-from skimage.color import rgb2gray
+from skimage.color import rgb2gray, rgb2lab
 from tqdm import tqdm
 import os
 from scipy import stats
-
+from exploration.colour_utilities import get_dominant_colours
+# %%
 
 def get_features(filename):
     image = io.imread(filename)
@@ -15,10 +16,21 @@ def get_features(filename):
     mode_red = stats.mode(image[:, :, 0], axis=None)[0][0]
     mode_green = stats.mode(image[:, :, 1], axis=None)[0][0]
     mode_blue = stats.mode(image[:, :, 2], axis=None)[0][0]
+    dominant_colours = []
+
+    for c in get_dominant_colours(filename, count=5):
+        dominant_colours.append(rgb2lab(c).tolist())
+
+   
+        # lab_dom_col = []
+        # for col in dominant_colors:
+        #     lab_dom_col.append(rgb2lab(col))
+
     return {'mean':mean,
             'mode_red':mode_red,
             'mode_green':mode_green,
-            'mode_blue':mode_blue}
+            'mode_blue':mode_blue,
+            'dominant_colours':dominant_colours}
 
 
 if __name__ == '__main__':
@@ -41,3 +53,5 @@ if __name__ == '__main__':
         else:
             raise Exception('Feature \'' +str(key)+'\' must be int, float or np.number not '+str(feature_type))
     print('Features will work with the simple model :)')
+
+# %%

@@ -7,7 +7,7 @@ from sklearn.cluster import KMeans
 import wcag_contrast_ratio as contrast
 
 
-def get_dominant_colours(path, *, count):
+def get_dominant_colours(path, *, count=5):
     """
     Return a list of the dominant RGB colours in the image at ``path``.
 
