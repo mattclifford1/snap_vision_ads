@@ -9,6 +9,8 @@ import torch
 from torchvision import transforms
 from skimage import transform
 
+import cv2 # add to requirements
+
 class Rescale(object): # and read
     """Rescale the image in a sample to a given size.
 
@@ -26,6 +28,44 @@ class Rescale(object): # and read
         for key in sample.keys():
             sample[key] = transform.resize(sample[key], (self.new_h, self.new_w))
         return sample
+
+
+
+class Mask(object):
+    """Apply thresholding to image
+    
+    Args:
+        Fixed values for thresholding # edit 
+    """
+
+    def __init__(self, threshold_params):
+        #assert isinstance(threshold_params, tuple)
+        assert isinstance(threshold_params, list)
+        #assert len(threshold_params) = 2
+        #assert(all(isinstance(item, tuple) for item in threshold_params))
+        self.threshold_params = threshold_params
+        lower, upper = self.threshold_params
+        self.lower, self.upper = np.array(list(lower)), np.array(list(upper))
+
+    def __call__(self, sample):
+        for key in sample.keys():
+            sample[key] = transform.resize(sample[key], (self.new_h, self.new_w))
+        return sample
+
+    def mask(self, image):
+        h, w = image.shape[:2]
+        # Create mask to only select black 
+        thresh = cv2.inRange(image, self.lower, self.upper)
+        # apply morphology
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))
+        morph = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+        # invert morp image
+        mask = 255 - morph
+        # apply mask to image
+        result = cv2.bitwise_and(image, image, mask=mask)
+        return result
+
+
 
 
 class RandomCrop(object):

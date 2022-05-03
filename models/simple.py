@@ -10,7 +10,11 @@ sys.path.append('..')
 from evaluation import nearest_points
 
 
-def get_features_csv(features_csv):
+def get_features_csv(features_csv, apply_mask=False):
+    # don't check features file exists if using masked images
+    if apply_mask == True:
+        from exploration import save_features
+        save_features.save_simple_features(features_csv=features_csv, apply_mask=True)
     # check features file exists (create if not)
     if not os.path.isfile(features_csv):
         from exploration import save_features
@@ -20,10 +24,15 @@ def get_features_csv(features_csv):
 
 
 class model:
-    def __init__(self, csv_file):
+    def __init__(self, csv_file, apply_mask=False):
         self.features_csv = csv_file
         self.simple_features = ['mean','mode_red','mode_green','mode_blue']
         self.df = get_features_csv(self.features_csv)
+        self.apply_mask = apply_mask
+        if self.apply_mask == True:
+            self.df = get_features_csv(self.features_csv, self.apply_mask)
+        else:
+            self.df = get_features_csv(self.features_csv)
 
     def run(self):
         '''
