@@ -45,6 +45,9 @@ def eval(model, ARGS):
     fig = plt.figure(figsize=(pic_size*ARGS.num_neighbours, pic_size*ARGS.num_disp))
     for i in tqdm(range(len(data_results['image_paths'])), desc="Evaluating closest embeddings", leave=False):
         count += 1
+        if ARGS.show_nums != []:
+            if str(count) not in ARGS.show_nums:
+                continue
         # deterime if this embedding has passed or failed on labels
         if data_results['labels'][i] in data_results['closest_labels'][i]: # passed
             if 'pass' not in ARGS.show_case:
@@ -143,6 +146,7 @@ if __name__ == '__main__':
     parser.add_argument("--num_disp", default=1, type=int, help='number of eval example to display at once')
     parser.add_argument("--num_neighbours", default=5, type=int, help='number of closest neighbours to display')
     parser.add_argument("--save_fig", default=False, action='store_true', help='save figure of closest embeddings to file')
+    parser.add_argument("--show_nums", nargs="+", default=[], help='show specific samples from eval set')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)
