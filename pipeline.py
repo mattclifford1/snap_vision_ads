@@ -4,7 +4,7 @@ import os
 from data import download, resize_dataset
 from wrangling.database_creator import contruct_database
 from wrangling.explore_dataset import print_stats
-from models import simple, toy_network, network, FaceNet, utils
+from models import simple, dom_colours, toy_network, network, FaceNet, utils
 from training import torch_trainer
 from evaluation import eval_torch_model
 
@@ -65,6 +65,20 @@ def run_pipeline(ARGS):
         results = simple_model.run()
         print_results(results)
 
+    if 'dom_colours' in ARGS.models_list:
+        dom_colours_model_csv = os.path.join(ARGS.save_dir, 'dom_colours_model.csv')
+        if os.path.isfile(dom_colours_model_csv):   # calcuate features from scratch rather than using cached
+            os.remove(dom_colours_model_csv)
+        print('\nRunning dominant colour model')
+        
+        # mask images 
+        if ARGS.apply_mask:
+            dom_colours_model = dom_colours.model(dom_colours_model_csv, apply_mask=True)
+        else:
+            dom_colours_model = dom_colours.model(dom_colours_model_csv)
+        results = dom_colours_model.run()
+        print_results(results)
+
     if 'simple_net' in ARGS.models_list:
         print('\nRunning simple neural network with triplet loss')
         model = toy_network.toy_network()
@@ -87,7 +101,7 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
     parser.add_argument("--dataset_stats", default=False, action='store_true', help='prints out some basic statistics about the dataset')
-    parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
+    parser.add_argument("-m", "--models_list", nargs="+", default='simple', choices=['simple', 'dom_colours', 'simple_net', 'big_net', 'facenet'], help='list of models to use')
     parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location to save models during training')
     parser.add_argument("--epochs", default=50, type=int, help='how many epochs to train for')
     parser.add_argument("--batch_size", default=64, type=int, help='batch size to use during training')
