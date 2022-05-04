@@ -7,5 +7,5 @@ conda activate $VENV
 
 python evaluate_visually.py --save_fig --num_disp 310 --show_case fail --model simple
 python evaluate_visually.py --save_fig --num_disp 310 --show_case pass --model simple
-# python evaluate_visually.py --save_fig --num_disp 310 --show_case fail --model simple_net
-# python evaluate_visually.py --save_fig --num_disp 310 --show_case pass --model simple_net
+python evaluate_visually.py --save_fig --num_disp 310 --show_case fail --model simple_net
+python evaluate_visually.py --save_fig --num_disp 310 --show_case pass --model simple_net
