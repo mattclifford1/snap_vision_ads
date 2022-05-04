@@ -7,7 +7,7 @@ import ast
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from evaluation import nearest_points
+from evaluation import nearest_points, colour_compare
 from exploration.features import get_simple_features, get_dominant_colours_features
 
 
@@ -31,9 +31,11 @@ class model:
         if features == 'simple':
             self.features_keys = ['mean','mode_red','mode_green','mode_blue']
             features_func = get_simple_features
+            self.eval_func = nearest_points
         elif features == 'dom_colours':
             self.features_keys = ['dominant_colours']
             features_func = get_dominant_colours_features
+            self.eval_func = colour_compare
         else:
             raise Exception('Feature type \'' +str(features)+'\' incorrect for simple model')
 
@@ -54,7 +56,7 @@ class model:
         labels = list(self.df['label'])
 
         # eval features
-        evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
+        evaluation = self.eval_func.eval(embeddings, labels)  # will print out accuracy
         return evaluation.results
 
     def get_embedding(self, image_path):
