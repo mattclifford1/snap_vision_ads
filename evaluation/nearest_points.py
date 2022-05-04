@@ -61,6 +61,7 @@ class eval:
         # y_test = y_train.pop(i)
 
         y_pred = get_knn_closest(self.embeddings, self.labels, [self.embeddings[i]], self.num_neighbours)
+        print('YPRED: ',[self.labels[i]] + y_pred)
         return [self.labels[i]] + y_pred
 
 

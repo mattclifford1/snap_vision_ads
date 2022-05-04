@@ -61,6 +61,7 @@ class eval:
 
     def get_score(self, i):
         y_pred = get_closest_colours(self.embeddings, self.labels, self.embeddings[i], self.num_neighbours)
+        # print('YPRED: ',[self.labels[i]] + y_pred)
         return [self.labels[i]] + y_pred
 
 
@@ -97,21 +98,19 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
         result['distance'].append(sum_dist)
         result['label'].append(labels[m])
 
-    nn = num_neighbours+1
+    nn = int(num_neighbours+1)
+    inds = np.argpartition(result['distance'], nn)[:nn].tolist()
+    # print('INDICES: ',inds, '\n Distances: ',[result['distance'][idx] for idx in inds])
+    
 
-    ind = np.argpartition(result['distance'].tolist(), -nn)[-nn:]     
-
-    print(ind)
-    distances = result['distance'][np.argpartition(result['distance'].tolist(), -nn)[-nn:]]     
-    print('DISTANCE: ',distances)
-    print("DISTANCES: ",result['distance'][ind])
-    sort_inds = np.argsort(result['distance'][ind])
-    print('SORTED: ',sort_inds)
-
+    sort_inds = np.argsort([result['distance'][idx] for idx in inds])
+    # print('Sorted INDICES: ',[inds[ins] for ins in sort_inds])
+    labels_out = [result['label'][idx] for idx in sort_inds] 
+    # print(labels_out)
     # sort_ind = ind[]   
     # sort_ind = ind[np.argsort(result['distance'][ind])]   
-
-    return result['labels'][sort_inds][1:]
+    # print(labels_out)
+    return labels_out[1:]
 
 
 

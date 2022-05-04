@@ -73,7 +73,7 @@ class model:
             row = row[0]
 
         dict_row = ast.literal_eval(self.df['features'][row])
-        simple_feat_dict = {key:dict_row[key] for key in self.simple_features}
+        simple_feat_dict = {key:dict_row[key] for key in self.features_keys}
         embedding = list(simple_feat_dict.values())
         return embedding
 
