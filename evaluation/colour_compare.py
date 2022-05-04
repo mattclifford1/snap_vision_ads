@@ -48,7 +48,10 @@ class eval:
     def run_sequentially(self):
         scores = []
         for i in tqdm(range(len(self.labels)), desc="Eval Sequential compute", leave=False):
-            scores.append(self.get_score(i))
+            score = self.get_score(i)
+            print(score)
+            scores.append(score)
+            # scores.append(self.get_score(i))
         return scores
 
     def run_parellel(self):
@@ -57,27 +60,30 @@ class eval:
         return scores
 
     def get_score(self, i):
-        y_pred = get_closest_colours(self.embeddings, self.labels, [self.embeddings[i]], self.num_neighbours)
+        y_pred = get_closest_colours(self.embeddings, self.labels, self.embeddings[i], self.num_neighbours)
         return [self.labels[i]] + y_pred
 
 
 def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
-
+    dom_cols = dom_cols[0]
     result = {'label':[],'distance':[]}
 
     for m in range(len(embeddings)):
         
-        e = embeddings[m]
+        e = embeddings[m][0]
         n = len(dom_cols)
         A = np.zeros([n,n])
-        print('Dominant Colours: ',dom_cols,'\n','-'*50,'\n','Embeddings: ',e)
+
         i = 0
         j = 0
 
         # for d in data['dom_colours_lab'][0]:
         for t in range(0,n):
             for c in range(0,n):
-                A[t,c] = color.deltaE_cie76(e[c],dom_cols[0][t])
+                # print('N: ',n,' | T: ',t,' | C: ',c)
+                # print('-'*100)
+                # print('Embedding Colour: ',e[c],'\n Test Colour: ',dom_cols[t],'\n Distance: ',color.deltaE_cie76(e[c],dom_cols[t]))
+                A[t,c] = color.deltaE_cie76(e[c],dom_cols[t])
 
         inds_A = scipy.optimize.linear_sum_assignment(A)
 
@@ -90,11 +96,22 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
 
         result['distance'].append(sum_dist)
         result['label'].append(labels[m])
-    nn = num_neighbours+1
-    ind = np.argpartition(result['distance'], -nn)[-nn:]     
-    ind[np.argsort(result['distance'][ind])]   
 
-    return result['labels'][ind][1:]
+    nn = num_neighbours+1
+
+    ind = np.argpartition(result['distance'].tolist(), -nn)[-nn:]     
+
+    print(ind)
+    distances = result['distance'][np.argpartition(result['distance'].tolist(), -nn)[-nn:]]     
+    print('DISTANCE: ',distances)
+    print("DISTANCES: ",result['distance'][ind])
+    sort_inds = np.argsort(result['distance'][ind])
+    print('SORTED: ',sort_inds)
+
+    # sort_ind = ind[]   
+    # sort_ind = ind[np.argsort(result['distance'][ind])]   
+
+    return result['labels'][sort_inds][1:]
 
 
 
