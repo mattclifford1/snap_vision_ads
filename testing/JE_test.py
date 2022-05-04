@@ -76,8 +76,7 @@ for set in sets:
         lab_dom_col = []
         for col in dominant_colors:
             lab_dom_col.append(color.rgb2lab(col))
-            
-            print(np.dtype(lab_dom_col.tolist()))
+
         
         data['dom_colours_rgb'].append(dominant_colors)
         data['dom_colours_lab'].append(lab_dom_col)
@@ -108,6 +107,7 @@ for k in range(0,len(data['path'])):
                     'distance':color.deltaE_cie76(comp_im['dom_colours_lab'][c],
                     test_image['dom_colours_lab'][t])})
 
+            print('comp',comp_im['dom_colours_lab'][c])
             A[t,c] = color.deltaE_cie76(comp_im['dom_colours_lab'][c],
                                         test_image['dom_colours_lab'][t])
         col_data.append(row_data)

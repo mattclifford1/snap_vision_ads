@@ -7,7 +7,7 @@ import ast
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from evaluation import nearest_points
+from evaluation import colour_compare
 
 
 def get_features_csv(features_csv):
@@ -22,7 +22,7 @@ def get_features_csv(features_csv):
 class model:
     def __init__(self, csv_file):
         self.features_csv = csv_file
-        self.simple_features = ['mean','mode_red','mode_green','mode_blue']
+        self.evaluation_features = ['dominant_colours']
         self.df = get_features_csv(self.features_csv)
 
     def run(self):
@@ -35,12 +35,12 @@ class model:
         for row in range(self.df.shape[0]):
             # convert dict in str format to list of its values
             dict_row = ast.literal_eval(self.df['features'][row])
-            simple_feat_dict = {key:dict_row[key] for key in self.simple_features}
-            embeddings.append(list(simple_feat_dict.values()))
+            eval_features = {key:dict_row[key] for key in self.evaluation_features}
+            embeddings.append(list(eval_features.values()))
         labels = list(self.df['label'])
 
         # eval features
-        evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
+        evaluation = colour_compare.eval(embeddings, labels)  # will print out accuracy
         return evaluation.results
 
     def get_embedding(self, image_path):
@@ -57,8 +57,8 @@ class model:
             row = row[0]
 
         dict_row = ast.literal_eval(self.df['features'][row])
-        simple_feat_dict = {key:dict_row[key] for key in self.simple_features}
-        embedding = list(simple_feat_dict.values())
+        eval_features = {key:dict_row[key] for key in self.evaluation_features}
+        embedding = list(eval_features.values())
         return embedding
 
 

@@ -7,7 +7,6 @@ from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 from tqdm import tqdm
 
-
 class eval:
     '''
     compare emeddings to labels
@@ -76,8 +75,8 @@ def get_knn_closest(X_train, y_train, x_test, num_neighbours=5):
         neighbours.append(y_train[ind])
     return neighbours[1:]  # don't include x_test (is closest to itself)
 
-
 if __name__ == '__main__':
     embeddings = [[1,1], [2,4], [5,4], [2,1], [1,1]]
     labels = ['a', 'b', 'b', 'a', 'a']
     eval(embeddings, labels)
+

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from data import download, resize_dataset
 from data_loader.load import get_database
 from wrangling.database_creator import contruct_database
-from models import simple, toy_network, network, FaceNet, neural_network
-from evaluation import nearest_points
+from models import simple, dom_colours, toy_network, network, FaceNet, neural_network
+from evaluation import nearest_points, colour_compare
 from utils import get_label, plot_closest
 
 def eval(model, ARGS):
@@ -103,6 +103,10 @@ def run_pipeline(ARGS):
         simple_model = simple.model(os.path.join(ARGS.save_dir, 'simple_model.csv'))
         eval(simple_model, ARGS)
 
+    elif 'dom_colours' == ARGS.model:
+        dom_colours_model = dom_colours.model(os.path.join(ARGS.save_dir, 'dom_colours_model.csv'))
+        eval(dom_colours_model, ARGS)
+
     elif 'simple_net' == ARGS.model:
         model = toy_network.toy_network()
         net_model = neural_network.run_net(ARGS.save_dir, model, ARGS.learning_rate, ARGS.lr_decay, ARGS.batch_size, ARGS.checkpoint)
@@ -124,7 +128,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Data pipeline for training and evaluating image embeddings')
     parser.add_argument("--dataset_dir", default='data', help='Location to read/save the uob_image_set used to training/eval')
     parser.add_argument("--big_ims", default=False, action='store_true', help='use full size images for training')
-    parser.add_argument("-m", "--model", type=str, default='simple', choices=['simple', 'simple_net', 'big_net', 'facenet'], help='models to use')
+    parser.add_argument("-m", "--model", type=str, default='simple', choices=['simple', 'dom_colours', 'simple_net', 'big_net', 'facenet'], help='models to use')
     # select model weights (if neural network model)
     parser.add_argument("--save_dir", default='data/files_to_gitignore/models', help='Location models were saved during training')
     parser.add_argument("--checkpoint", default='latest', help='epoch of pretained network weights to load')
