@@ -29,7 +29,12 @@ class model:
         self.features_csv = csv_file
         self.apply_mask = apply_mask
         if features == 'simple':
-            self.features_keys = ['mean','mode_red','mode_green','mode_blue']
+            self.features_keys = ['mean_red',
+                                  'mean_green',
+                                  'mean_blue',
+                                  'mode_red',
+                                  'mode_green',
+                                  'mode_blue']
             features_func = get_simple_features
             self.eval_func = nearest_points
         elif features == 'dom_colours':
