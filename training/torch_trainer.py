@@ -37,14 +37,15 @@ class trainer():
         # get data loader
         self.get_data_loader(prefetch_factor=2)
 
-    def get_data_loader(self, prefetch_factor=2):
+    def get_data_loader(self, prefetch_factor=1):
         trans = transforms.Compose([Rescale((self.model.input_size+100, self.model.input_size+100)),
         RandomCrop(self.model.input_size)])
         transformed_dataset = get_data(transform=trans)
+        cores = int(self.cores/2)
         self.dataloader = DataLoader(transformed_dataset,
                                      batch_size=self.batch_size,
                                      shuffle=True,
-                                     num_workers=int(self.cores/2),
+                                     num_workers=cores,
                                      prefetch_factor=prefetch_factor)
 
     def setup(self):
@@ -70,7 +71,7 @@ class trainer():
             if epoch >= self.start_epoch:
                 self.running_loss = []
                 # train for one epoch
-                for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=False)):
+                for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=True)):
                     self.train_step(sample)
 
                 # maybe eval, save model and lower learning rate
@@ -94,7 +95,7 @@ class trainer():
         anchor_img = sample['image'].to(device=self.device, dtype=torch.float)
         positive_img = sample['positive'].to(device=self.device, dtype=torch.float)
         negative_img = sample['negative'].to(device=self.device, dtype=torch.float)
-        
+
         # zero the parameter gradients
         self.optimiser.zero_grad()
 

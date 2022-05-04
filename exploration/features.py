@@ -29,11 +29,15 @@ def get_simple_features(filename, apply_mask=False, lower=[200, 200, 200], upper
         lower = np.array(lower)
         upper = np.array(upper)
         image = mask(image, lower, upper)
-    mean = np.mean(image)
+    mean_red = np.mean(image[:, :, 0])
+    mean_green = np.mean(image[:, :, 1])
+    mean_blue = np.mean(image[:, :, 2])
     mode_red = stats.mode(image[:, :, 0], axis=None)[0][0]
     mode_green = stats.mode(image[:, :, 1], axis=None)[0][0]
     mode_blue = stats.mode(image[:, :, 2], axis=None)[0][0]
-    return {'mean':mean,
+    return {'mean_red':mean_red,
+            'mean_green':mean_green,
+            'mean_blue':mean_blue,
             'mode_red':mode_red,
             'mode_green':mode_green,
             'mode_blue':mode_blue}

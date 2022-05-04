@@ -54,8 +54,11 @@ class run_net:
 
 
 if __name__ == '__main__':
-    from models import FaceNet
-    net = FaceNet.FaceNetInception()
+    from models import FaceNet, toy_network, network
+    # net = FaceNet.FaceNetInception()
+    net = network.network()
+    # net = toy_network.toy_network()
+    # print(net)
     m = run_net('data/files_to_gitignore/models', net, 0.001, 0.98, 16)
     embedding = m.get_embedding('data/uob_image_set512/16288974/16288974_1.jpg')
     print(embedding)

@@ -23,11 +23,11 @@ The model weights will be saved inside the `save_dir` along with training stats 
 ## Evaluation
 To run the evaluation pipeline to display the closest embeddings use:
 ```
-$ python evaluate.py
+$ python evaluate_visually.py
 ```
 You can specify different models with the `--model` command line argument for example:
 ```
-$ python evaluate.py --model simple_net
+$ python evaluate_visually.py --model simple_net
 ```
 Will evaluate the [simple_net](models/toy_network.py) model with the latest training checkpoint.
 ### Example Closest embeddings from simple_net
@@ -46,30 +46,30 @@ Will evaluate the [simple_net](models/toy_network.py) model with the latest trai
 ### Extra options
 By default all images from the eval set are show, to just show cases where the closest embeddings contain a correct similar image use:
 ```
-$ python evaluate.py --show_case pass
+$ python evaluate_visually.py --show_case pass
 ```
 or only where the closest embeddings dont contain a similar image:
 ```
-$ python evaluate.py --show_case fail
+$ python evaluate_visually.py --show_case fail
 ```
 By default only one image with its closest embeddings is shown, to increase it use:
 ```
-$ python evaluate.py --num_disp 10
+$ python evaluate_visually.py --num_disp 10
 ```
 To save all eval examples to an image file at `data/files_to_gitignore/eval_figs` use:
 ```
-$ python evaluate.py --num_disp 100 --save_fig
+$ python evaluate_visually.py --num_disp 100 --save_fig
 ```
 By default 5 of the closest embeddings are shown, to change it use:
 ```
-$ python evaluate.py --num_neighbours 7
+$ python evaluate_visually.py --num_neighbours 7
 ```
 ### View all evaluations
 images of all embeddings from simple and simple_net model can be found [evaluation/eval_figs](evaluation/eval_figs)
 ### Download model weights from the cloud
 If you don't have the model's weights stored locally, the download them from the cloud using:
 ```
-$ python evaluate.py --model simple_net --download_weights
+$ python evaluate_visually.py --model simple_net --download_weights
 ```
 Which downloads the default simple neural network model. Use the `---weights_url` argument to change to a different model's storage location on the cloud. Model's must come in a zipped format.
 
