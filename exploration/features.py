@@ -38,7 +38,7 @@ def get_simple_features(filename, apply_mask=False, lower=[200, 200, 200], upper
             'mode_green':mode_green,
             'mode_blue':mode_blue}
 
-def get_dominant_colours_features(filename):
+def get_dominant_colours_features(filename, apply_mask=False, lower=[200, 200, 200], upper=[255, 255, 255]):
     dominant_colours = []
 
     for c in get_dominant_colours(filename, count=5):
