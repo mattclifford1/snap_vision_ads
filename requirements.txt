@@ -9,3 +9,5 @@ torch
 torchvision
 tqdm
 wget
+opencv-python
+wcag-contrast-ratio

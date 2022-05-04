@@ -10,6 +10,7 @@ def get_all_subdirs(dir):
     for path in all_paths:
         if os.path.isdir(path):
             dirs.append(path)
+    dirs.pop(0) # remove base dir
     return dirs
 
 def get_all_files(dir):
@@ -27,6 +28,8 @@ def print_average_dir_contents(dirs):
     for dir in dirs:
         contents.append(len(os.listdir(dir)))
     print('Mean images in dir: '+str(sum(contents)/len(contents)))
+    print('Max images in dir: '+str(max(contents)))
+    print('Min images in dir: '+str(min(contents)))
 
 def get_all_file_type(files):
     # explore all the different file extensions

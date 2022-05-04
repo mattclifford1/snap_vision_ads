@@ -8,23 +8,11 @@ from tqdm import tqdm
 import os
 from scipy import stats
 from exploration.colour_utilities import get_dominant_colours
-# %%
 import cv2
 
 
-# def get_features(filename):
-#     image = io.imread(filename)
-#     mean = np.mean(image)
-#     mode_red = stats.mode(image[:, :, 0], axis=None)[0][0]
-#     mode_green = stats.mode(image[:, :, 1], axis=None)[0][0]
-#     mode_blue = stats.mode(image[:, :, 2], axis=None)[0][0]
-#     return {'mean':mean,
-#             'mode_red':mode_red,
-#             'mode_green':mode_green,
-#             'mode_blue':mode_blue}
-
 def mask(image, lower_thresh, upper_thresh):
-    # Create mask to only select black 
+    # Create mask to only select black
     thresh = cv2.inRange(image, lower_thresh, upper_thresh)
     # apply morphology
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))
@@ -35,7 +23,7 @@ def mask(image, lower_thresh, upper_thresh):
     result = cv2.bitwise_and(image, image, mask=mask)
     return result
 
-def get_features(filename, apply_mask=False, lower=[200, 200, 200], upper=[255, 255, 255]):
+def get_simple_features(filename, apply_mask=False, lower=[200, 200, 200], upper=[255, 255, 255]):
     image = io.imread(filename)
     if apply_mask == True:
         lower = np.array(lower)
@@ -45,21 +33,23 @@ def get_features(filename, apply_mask=False, lower=[200, 200, 200], upper=[255, 
     mode_red = stats.mode(image[:, :, 0], axis=None)[0][0]
     mode_green = stats.mode(image[:, :, 1], axis=None)[0][0]
     mode_blue = stats.mode(image[:, :, 2], axis=None)[0][0]
+    return {'mean':mean,
+            'mode_red':mode_red,
+            'mode_green':mode_green,
+            'mode_blue':mode_blue}
+
+def get_dominant_colours_features(filename, apply_mask=False, lower=[200, 200, 200], upper=[255, 255, 255]):
     dominant_colours = []
 
     for c in get_dominant_colours(filename, count=5):
         dominant_colours.append(rgb2lab(c).tolist())
 
-   
+
         # lab_dom_col = []
         # for col in dominant_colors:
         #     lab_dom_col.append(rgb2lab(col))
 
-    return {'mean':mean,
-            'mode_red':mode_red,
-            'mode_green':mode_green,
-            'mode_blue':mode_blue,
-            'dominant_colours':dominant_colours}
+    return {'dominant_colours':dominant_colours}
 
 if __name__ == '__main__':
     print('Testing features')

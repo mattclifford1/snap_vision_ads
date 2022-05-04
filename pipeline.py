@@ -53,29 +53,21 @@ def run_pipeline(ARGS):
     # run models
     if 'simple' in ARGS.models_list:
         simple_model_csv = os.path.join(ARGS.save_dir, 'simple_model.csv')
-        if os.path.isfile(simple_model_csv):   # calcuate features from scratch rather than using cached
+        if os.path.isfile(simple_model_csv) and not ARGS.reuse_simple_features:   # calcuate features from scratch rather than using cached
             os.remove(simple_model_csv)
         print('\nRunning simple model')
-        
-        # mask images 
-        if ARGS.apply_mask:
-            simple_model = simple.model(simple_model_csv, apply_mask=True)
-        else:
-            simple_model = simple.model(simple_model_csv)
+
+        simple_model = simple.model(simple_model_csv, apply_mask=ARGS.apply_mask)
         results = simple_model.run()
         print_results(results)
 
     if 'dom_colours' in ARGS.models_list:
         dom_colours_model_csv = os.path.join(ARGS.save_dir, 'dom_colours_model.csv')
-        if os.path.isfile(dom_colours_model_csv):   # calcuate features from scratch rather than using cached
+        if os.path.isfile(dom_colours_model_csv) and not ARGS.reuse_simple_features:   # calcuate features from scratch rather than using cached
             os.remove(dom_colours_model_csv)
         print('\nRunning dominant colour model')
-        
-        # mask images 
-        if ARGS.apply_mask:
-            dom_colours_model = dom_colours.model(dom_colours_model_csv, apply_mask=True)
-        else:
-            dom_colours_model = dom_colours.model(dom_colours_model_csv)
+
+        dom_colours_model = simple.model(dom_colours_model_csv, apply_mask=ARGS.apply_mask, features='dom_colours')
         results = dom_colours_model.run()
         print_results(results)
 
@@ -108,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument("-lr", "--learning_rate", default=0.0001, type=float, help='learning rate to use during training')
     parser.add_argument("-lrd", "--lr_decay", default=0.95, type=float, help='learning rate dacay to use during training')
     parser.add_argument("--apply_mask", default = False, help='option to mask images to remove background (experimental)')
+    parser.add_argument("--reuse_simple_features", default=False, action='store_true', help='Wont recalculate simple_model features')
     ARGS = parser.parse_args()
 
     run_pipeline(ARGS)

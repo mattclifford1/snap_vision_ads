@@ -7,32 +7,39 @@ import ast
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from evaluation import nearest_points
+from evaluation import nearest_points, colour_compare
+from exploration.features import get_simple_features, get_dominant_colours_features
 
 
-def get_features_csv(features_csv, apply_mask=False):
-    # don't check features file exists if using masked images
-    if apply_mask == True:
-        from exploration import save_features
-        save_features.save_simple_features(features_csv=features_csv, apply_mask=True)
+def get_features_csv(features_csv, apply_mask=False, features_func=get_simple_features):
     # check features file exists (create if not)
     if not os.path.isfile(features_csv):
         from exploration import save_features
-        save_features.save_simple_features(features_csv=features_csv)
+        save_features.save_simple_features(features_csv=features_csv,
+                                           apply_mask=apply_mask,
+                                           features_func=features_func)
     df = pd.read_csv(features_csv)
     return df
 
 
 class model:
-    def __init__(self, csv_file, apply_mask=False):
+    def __init__(self, csv_file,
+                       apply_mask=False,
+                       features='simple'):
         self.features_csv = csv_file
-        self.simple_features = ['mean','mode_red','mode_green','mode_blue']
-        self.df = get_features_csv(self.features_csv)
         self.apply_mask = apply_mask
-        if self.apply_mask == True:
-            self.df = get_features_csv(self.features_csv, self.apply_mask)
+        if features == 'simple':
+            self.features_keys = ['mean','mode_red','mode_green','mode_blue']
+            features_func = get_simple_features
+            self.eval_func = nearest_points
+        elif features == 'dom_colours':
+            self.features_keys = ['dominant_colours']
+            features_func = get_dominant_colours_features
+            self.eval_func = colour_compare
         else:
-            self.df = get_features_csv(self.features_csv)
+            raise Exception('Feature type \'' +str(features)+'\' incorrect for simple model')
+
+        self.df = get_features_csv(self.features_csv, self.apply_mask, features_func)
 
     def run(self):
         '''
@@ -44,12 +51,12 @@ class model:
         for row in range(self.df.shape[0]):
             # convert dict in str format to list of its values
             dict_row = ast.literal_eval(self.df['features'][row])
-            simple_feat_dict = {key:dict_row[key] for key in self.simple_features}
+            simple_feat_dict = {key:dict_row[key] for key in self.features_keys}
             embeddings.append(list(simple_feat_dict.values()))
         labels = list(self.df['label'])
 
         # eval features
-        evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
+        evaluation = self.eval_func.eval(embeddings, labels)  # will print out accuracy
         return evaluation.results
 
     def get_embedding(self, image_path):
