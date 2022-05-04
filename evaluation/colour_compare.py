@@ -66,17 +66,17 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
     result = {'label':[],'distance':[]}
 
     for m in range(len(embeddings)):
+        
         e = embeddings[m]
         n = len(dom_cols)
         A = np.zeros([n,n])
-
+        print('Dominant Colours: ',dom_cols,'\n','-'*50,'\n','Embeddings: ',e)
         i = 0
         j = 0
 
         # for d in data['dom_colours_lab'][0]:
         for t in range(0,n):
             for c in range(0,n):
-                print('E :',e[c],'   |     test: ',dom_cols[t])
                 A[t,c] = color.deltaE_cie76(e[c],dom_cols[0][t])
 
         inds_A = scipy.optimize.linear_sum_assignment(A)
@@ -93,8 +93,6 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
     nn = num_neighbours+1
     ind = np.argpartition(result['distance'], -nn)[-nn:]     
     ind[np.argsort(result['distance'][ind])]   
-     
-    print(result['labels'][ind][1:])
 
     return result['labels'][ind][1:]
 
