@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 from skimage import io
 import torch
 import random
@@ -73,6 +74,21 @@ class get_data:
         for i in range(len(self.similar_images)):
             self.similar_images[i] = ast.literal_eval(self.similar_images[i])
 
+    def get_negative(self, i, anchor, pos):
+        random_similar = random.choice(self.similar_images[i])
+        not_similars = list(set(self.image_paths) - set(self.similar_images[i]))
+        dist_pos = 1
+        dist_neg = 0
+        count = 0
+        while dist_pos > dist_neg:  # loop until we find example where neg is closer than pos
+            if count > self.df.shape[0]: # no negative that is closer 
+                break
+            neg = random.choice(not_similars)
+            dist_pos = np.linalg.norm(self.offline_emb_data[anchor]-self.offline_emb_data[pos])
+            dist_neg = np.linalg.norm(self.offline_emb_data[anchor]-self.offline_emb_data[neg])
+            count += 1
+        return neg
+
     def __len__(self):
         return self.df.shape[0]
 
@@ -81,23 +97,60 @@ class get_data:
             i = i.tolist()
         # get file paths for im, pos, neg example
         image_path = self.image_paths[i]
-        random_similar = random.choice(self.similar_images[i])
-        not_similars = list(set(self.image_paths) - set(self.similar_images[i]))
-        random_not_similar = random.choice(not_similars)
         # get images from file
-        image_path = io.imread(image_path)
-        sample = {'image': image_path}
+        image = io.imread(image_path)
+        sample = {'image': image}
         if not self.eval:
-            random_similar = io.imread(random_similar)
-            random_not_similar = io.imread(random_not_similar)
-            sample['positive'] = random_similar
-            sample['negative'] = random_not_similar
+            random_similar = random.choice(self.similar_images[i])
+            # check on bad train/eval splits where similar is in the eval set... oops
+            while random_similar not in self.offline_emb_data.keys():
+                random_similar = random.choice(self.similar_images[i])
+            not_similar = self.get_negative(i, image_path, random_similar)
+            pos = io.imread(random_similar)
+            neg = io.imread(not_similar)
+            sample['positive'] = pos
+            sample['negative'] = neg
         # data transforms
         if self.transform:
             sample = self.transform(sample)
         sample = ToTensor(sample)
         # add label to sample
         sample['label'] = self.labels[i]
+        return sample
+
+'''
+for use with getting all embeddings to find hard negatives offline
+'''
+class get_all:
+    def __init__(self,
+                 transform=None,
+                 eval=False):
+        if eval == True:
+            self.df_csv = 'wrangling/image_paths_database_eval.csv'
+        else:
+            self.df_csv = 'wrangling/image_paths_database_train.csv'
+        self.eval = eval
+        self.transform = transform
+        self.df = pd.read_csv(self.df_csv)
+        self.image_paths = self.df['image_path'].tolist()
+
+    def __len__(self):
+        return self.df.shape[0]
+
+    def __getitem__(self, i):
+        if torch.is_tensor(i):
+            i = i.tolist()
+        # get file paths for im, pos, neg example
+        image_path = self.image_paths[i]
+        # get images from file
+        img = io.imread(image_path)
+        sample = {'image': img}
+        # data transforms
+        if self.transform:
+            sample = self.transform(sample)
+        sample = ToTensor(sample)
+        # add label to sample
+        sample['image_path'] = image_path
         return sample
 
 
@@ -109,6 +162,7 @@ def ToTensor(sample):
     for key in sample.keys():
         sample[key] = torch.from_numpy(sample[key].transpose((2, 0, 1)))
     return sample
+
 
 
 if __name__ == '__main__':

@@ -28,6 +28,7 @@ def print_average_dir_contents(dirs):
     for dir in dirs:
         contents.append(len(os.listdir(dir)))
     print('Mean images in dir: '+str(sum(contents)/len(contents)))
+    print('Mode images in dir: '+str(max(set(contents), key=contents.count)))
     print('Max images in dir: '+str(max(contents)))
     print('Min images in dir: '+str(min(contents)))
 

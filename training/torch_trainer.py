@@ -12,7 +12,7 @@ import multiprocessing
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from data_loader.load import get_data
+from data_loader.load import get_data, get_all
 from data_loader.augmentation import *
 from evaluation import eval_torch_model
 from models.toy_network import toy_network
@@ -34,17 +34,32 @@ class trainer():
         self.save_dir = save_dir
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.cores = multiprocessing.cpu_count()
+        self.offline_emb_data = {}
         # get data loader
         self.get_data_loader(prefetch_factor=2)
+        # get offline loader
+        self.get_offline_data_loader(prefetch_factor=2)
+
 
     def get_data_loader(self, prefetch_factor=1):
-        trans = transforms.Compose([Rescale((self.model.input_size+100, self.model.input_size+100)),
+        crop_addition =  int(self.model.input_size*0.1)
+        trans = transforms.Compose([Rescale((self.model.input_size+crop_addition, self.model.input_size+crop_addition)),
         RandomCrop(self.model.input_size)])
         transformed_dataset = get_data(transform=trans)
         cores = int(self.cores/2)
         self.dataloader = DataLoader(transformed_dataset,
                                      batch_size=self.batch_size,
                                      shuffle=True,
+                                     num_workers=cores,
+                                     prefetch_factor=prefetch_factor)
+
+    def get_offline_data_loader(self, prefetch_factor=2):
+        trans = transforms.Compose([Rescale((self.model.input_size, self.model.input_size))])
+        transformed_dataset = get_all(transform=trans)
+        cores = int(self.cores/2)
+        self.offline_dataloader = DataLoader(transformed_dataset,
+                                     batch_size=self.batch_size,
+                                     shuffle=False,
                                      num_workers=cores,
                                      prefetch_factor=prefetch_factor)
 
@@ -68,10 +83,13 @@ class trainer():
         self.eval(0)
         # training loop
         for epoch in tqdm(range(self.epochs), desc="Epochs"):
-            if epoch >= self.start_epoch:
+            if epoch >= self.start_epoch: #if loaded pretrained only start at correct epoch of training
+                for step, sample in enumerate(tqdm(self.offline_dataloader, desc="Offline Embeddings", leave=False)):
+                    self.offline_embeddings(sample)
+                self.dataloader.dataset.offline_emb_data = self.offline_emb_data # update offline embeddings 
                 self.running_loss = []
                 # train for one epoch
-                for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=True)):
+                for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=False)):
                     self.train_step(sample)
 
                 # maybe eval, save model and lower learning rate
@@ -89,6 +107,15 @@ class trainer():
         self.saver.save_model(self.model, epoch+1)
         self.model.eval()
         return self.model
+
+    def offline_embeddings(self, sample):
+        self.model.eval()   # put back into inference mode
+        img = sample['image'].to(device=self.device, dtype=torch.float)
+        embeddings = self.model(img)
+        for i in range(len(sample['image_path'])):
+            emb = embeddings[i, :].cpu().detach().numpy()
+            self.offline_emb_data[sample['image_path'][i]] = emb
+        self.model.train()   # put back into train mode
 
     def train_step(self, sample):
         # get training batch sample
