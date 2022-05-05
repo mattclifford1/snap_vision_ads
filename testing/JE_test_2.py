@@ -3,7 +3,7 @@
 
 # %autoreload 2
 
-
+%matplotlib inline
 # %%
 import csv
 # from __future__ import print_function
@@ -13,6 +13,10 @@ import os
 from tqdm import tqdm
 
 import binascii
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 import struct
 import pickle
 from PIL import Image
@@ -103,7 +107,7 @@ def get_closest_colours(test_image,comparison_images, n = 5):
             sum_dist = sum_dist + A[i][j]
 
         result['distance'].append(sum_dist)
-        result['label'].append(comparison_images['path'][m][107:115])
+        result['label'].append(comparison_images['path'][m][107:])
 
     nn = int(n+1)
     inds = np.argpartition(result['distance'], nn)[:nn].tolist()
@@ -115,6 +119,7 @@ def get_closest_colours(test_image,comparison_images, n = 5):
 # %%
 
 results_labels = []
+results = {'id':[],'set_id':[]}
 for k in tqdm(range(len(image_data_dict['path']))):
     test_image = {'path':image_data_dict['path'][k],
                   'dominant_colours':image_data_dict['dominant_colours'][k]}
@@ -122,24 +127,38 @@ for k in tqdm(range(len(image_data_dict['path']))):
     n = len(test_image['dominant_colours'])
     results_labels.append(get_closest_colours(test_image,image_data_dict,n))
 
-# %%
-def get_labels(i):
-
-    with open('/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/testing/im_data.pickle', 'rb') as handle:
-        image_data_var = pickle.load(handle)
-
-    test_image = {'path':image_data_var['path'][i],
-                  'dominant_colours':image_data_var['dominant_colours'][i]}
-
-    n = len(test_image['dominant_colours'])
-    labels = get_closest_colours(test_image,image_data_dict,n)
-    
-    return labels
+with open('/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/testing/result_labels.pickle', 'wb') as handle:
+    pickle.dump(results_labels, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 # %%
-pool_obj = multiprocessing.Pool()
-results_labels = list(tqdm(pool_obj.map(get_labels, range(len(image_data_dict['path']))),
-                                          total=len(image_data_dict['path'])))
 
+with open('/Users/jonathanerskine/Courses/Applied_Data_Science/CWK/snap_vision_ads/snap_vision_ads/testing/result_labels.pickle', 'rb') as handle:
+    results_labels_pickle = pickle.load(handle)
 
 # %%
+closest = 0
+top_5 = 0
+for labels in tqdm(results_labels_pickle):
+    if labels[0] in labels[1]:
+        closest += 1
+    if labels[0] in labels[1:]:
+        top_5 += 1
+
+# %% Evaluation
+for i in range(len(image_data_dict['path'])):
+    n = len(results_labels_pickle[0])
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, n, 1)
+    imgplot = plt.imshow(lum_img)
+    ax.set_title('Before')
+    plt.colorbar(ticks=[0.1, 0.3, 0.5, 0.7], orientation='horizontal')
+    ax = fig.add_subplot(1, 2, 2)
+    imgplot = plt.imshow(lum_img)
+    imgplot.set_clim(0.0, 0.7)
+    ax.set_title('After')
+    plt.colorbar(ticks=[0.1, 0.3, 0.5, 0.7], orientation='horizontal')
+    for 
+    img = mpimg.imread('../../doc/_static/stinkbug.png')
+    print(img)
+    imgplot = plt.imshow(img)
