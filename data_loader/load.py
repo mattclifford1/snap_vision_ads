@@ -100,6 +100,41 @@ class get_data:
         sample['label'] = self.labels[i]
         return sample
 
+'''
+for use with getting all embeddings to find hard negatives offline
+'''
+class get_all:
+    def __init__(self,
+                 transform=None,
+                 eval=False):
+        if eval == True:
+            self.df_csv = 'wrangling/image_paths_database_eval.csv'
+        else:
+            self.df_csv = 'wrangling/image_paths_database_train.csv'
+        self.eval = eval
+        self.transform = transform
+        self.df = pd.read_csv(self.df_csv)
+        self.image_paths = self.df['image_path'].tolist()
+
+    def __len__(self):
+        return self.df.shape[0]
+
+    def __getitem__(self, i):
+        if torch.is_tensor(i):
+            i = i.tolist()
+        # get file paths for im, pos, neg example
+        image_path = self.image_paths[i]
+        # get images from file
+        img = io.imread(image_path)
+        sample = {'image': img}
+        # data transforms
+        if self.transform:
+            sample = self.transform(sample)
+        sample = ToTensor(sample)
+        # add label to sample
+        sample['image_path'] = image_path
+        return sample
+
 
 def ToTensor(sample):
     """Convert ndarrays in sample to Tensors."""
