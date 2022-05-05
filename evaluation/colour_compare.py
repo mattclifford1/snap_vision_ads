@@ -70,7 +70,7 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
     result = {'label':[],'distance':[]}
 
     for m in range(len(embeddings)):
-        
+
         e = embeddings[m][0]
         n = len(dom_cols)
         A = np.zeros([n,n])
@@ -92,7 +92,7 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
         for n_A in range(0,len(inds_A[0])):
             i = inds_A[0][n_A]
             j = inds_A[1][n_A]
-        
+
             sum_dist = sum_dist + A[i][j]
 
         result['distance'].append(sum_dist)
@@ -101,14 +101,14 @@ def get_closest_colours(embeddings, labels, dom_cols, num_neighbours = 5):
     nn = int(num_neighbours+1)
     inds = np.argpartition(result['distance'], nn)[:nn].tolist()
     # print('INDICES: ',inds, '\n Distances: ',[result['distance'][idx] for idx in inds])
-    
+
 
     sort_inds = np.argsort([result['distance'][idx] for idx in inds])
     # print('Sorted INDICES: ',[inds[ins] for ins in sort_inds])
-    labels_out = [result['label'][idx] for idx in sort_inds] 
+    labels_out = [result['label'][idx] for idx in sort_inds]
     # print(labels_out)
-    # sort_ind = ind[]   
-    # sort_ind = ind[np.argsort(result['distance'][ind])]   
+    # sort_ind = ind[]
+    # sort_ind = ind[np.argsort(result['distance'][ind])]
     # print(labels_out)
     return labels_out[1:]
 
@@ -121,4 +121,3 @@ if __name__ == '__main__':
     embeddings = [[1,1], [2,4], [5,4], [2,1], [1,1]]
     labels = ['a', 'b', 'b', 'a', 'a']
     eval(embeddings, labels)
-

@@ -9,7 +9,7 @@ def plot(csv, name, col):
 
 
 
-csv1 = 'data/files_to_gitignore/models/FaceNetInception_LR_0.0001_decay_0.95_BS_64/training_stats.csv'
+csv1 = 'data/files_to_gitignore/models/FaceNetInception_LR_0.0001_decay_0.98_BS_64/training_stats.csv'
 csv2 = 'data/files_to_gitignore/models/network_LR_0.0001_decay_0.95_BS_64/training_stats.csv'
 csv3 = 'data/files_to_gitignore/models/toy_network_LR_0.0001_decay_0.95_BS_64/training_stats.csv'
 name1 = 'FaceNet Inception'
