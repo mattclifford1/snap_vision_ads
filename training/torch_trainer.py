@@ -86,6 +86,7 @@ class trainer():
             if epoch >= self.start_epoch: #if loaded pretrained only start at correct epoch of training
                 for step, sample in enumerate(tqdm(self.offline_dataloader, desc="Offline Embeddings", leave=False)):
                     self.offline_embeddings(sample)
+                self.dataloader.dataset.offline_emb_data = self.offline_emb_data # update offline embeddings 
                 self.running_loss = []
                 # train for one epoch
                 for step, sample in enumerate(tqdm(self.dataloader, desc="Train Steps", leave=False)):
@@ -114,7 +115,6 @@ class trainer():
         for i in range(len(sample['image_path'])):
             emb = embeddings[i, :].cpu().detach().numpy()
             self.offline_emb_data[sample['image_path'][i]] = emb
-        print(self.offline_emb_data)
         self.model.train()   # put back into train mode
 
     def train_step(self, sample):
