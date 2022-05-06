@@ -7,8 +7,7 @@ from data import download, resize_dataset
 from data_loader.load import get_database
 from wrangling.database_creator import contruct_database
 from models import simple, toy_network, network, FaceNet, neural_network
-from evaluation import nearest_points
-
+import pandas as pd
 
 def eval(model):
     # get the csv of the image paths of the evaluation database
@@ -26,35 +25,14 @@ def eval(model):
         embedding = model.get_embedding(row['image_path'])
         data_results['embeddings'].append(embedding)
 
-    # now find images of the closest embeddings
-    for i in tqdm(range(len(data_results['image_paths'])), desc="Getting knn closest embeddings", leave=False):
-        closest = nearest_points.get_knn_closest(data_results['embeddings'],
-                                                 data_results['image_paths'],
-                                                 [data_results['embeddings'][i]],
-                                                 num_neighbours=5)
-        data_results['closest'].append(closest)
+    df = pd.DataFrame()
+    for i in range(64):
+        df['feature' + str(i)] = []
 
-    # now do whatever you want with the images and their closest embeddings
-    count = 0
-    for i in tqdm(range(len(data_results['image_paths'])), desc="Evaluating closest embeddings", leave=False):
-        # read images from file
-        image_path = data_results['image_paths'][i]
-        image = io.imread(image_path)
-        closest = []
-        for closest_image__path in data_results['closest'][i]:
-            closest.append(io.imread(closest_image__path))
-        # now maybe plot the image and its closest?
-        # WRITE CODE HERE
-        #
-        #
-        #
+    for i in range(len(data_results['embeddings'])):
+        df.loc[i] = data_results['embeddings'][i]
 
-        # don't loop over the whole dataset whilst developing
-        if count > 10:
-            break
-        count += 1
-
-
+    df.to_csv('embeddings.csv', index=False)
 
 def run_pipeline(ARGS):
     print('Running Pipline with args: ', ARGS)

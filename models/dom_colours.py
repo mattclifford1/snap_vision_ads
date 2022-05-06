@@ -58,7 +58,7 @@ for set in sets:
         lab_dom_col = []
         for col in dominant_colors:
             lab_dom_col.append(color.rgb2lab(col))
-        
+
         data['dom_colours_rgb'].append(dominant_colors)
         data['dom_colours_lab'].append(lab_dom_col)
 
@@ -114,12 +114,12 @@ for k in range(0,len(data['path'])):
         i = inds_A[0][n]
         j = inds_A[1][n]
         col = [col_data[i][j]['test_col_rgb'],col_data[i][j]['im_col_rgb']]
-        
+
         squares = [coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[0])),coloured_square("#%02x%02x%02x" % tuple(int(v * 255) for v in col[1]))]
-        
+
         print(squares[0],squares[1],' | Distance: ',col_data[i][j]['distance'])
         sum_dist = sum_dist + col_data[i][j]['distance']
-    
+
     print("Total Distance: ", sum_dist)
 
 
@@ -130,32 +130,6 @@ for k in range(0,len(data['path'])):
 #         from exploration import save_features
 #         save_features.save_simple_features(features_csv=features_csv)
 
-def run(features_csv='exploration/database.csv'):
 
-    # for each image in database
-    # Check dominant colours against all other images 
-    #  for first image i, check i+1:end
-    #  for second image j, check j+1:end
-    # for all images, if distance <200, then add to similar images
-    #  using embeddings
-    #  then run nearest_points.eval(embeddings,labels)
-    #  maybe idk I aint a software engineer
-
-
-    # check_features(features_csv)
-    # # load features
-    # df = pd.read_csv(features_csv)
-    # embeddings = []
-    # # get all features from dataframe
-    # for row in range(df.shape[0]):
-    #     # convert dict in str format to list of its values
-    #     dict_row = ast.literal_eval(df['features'][row])
-    #     embeddings.append(list(dict_row.values()))
-    # labels = list(df['label'])
-
-    # # eval features
-    # evaluation = nearest_points.eval(embeddings, labels)  # will print out accuracy
-
-
-if __name__ == '__main__':
-    run()
+#if __name__ == '__main__':
+#    run()
