@@ -1,6 +1,5 @@
-# Snap Vision Data Pipeline
-The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
-![Alt text](misc/snap-vision-data-pipeline.png?raw=true "Data Pipeline")
+# Snap Vision
+Repository for learning visual embeddings for a fashion dataset. Read our [paper](https://github.com/mattclifford1/snap_vision_ads/blob/main/paper.pdf) for all the details and results of our models.
 
 # Running the Pipeline
 There are two pipelines to run, training and evaluation, make sure you have python set up with the correct packages installed before running by following the section below. If it is the first time running the pipeline it may take a little longer to run as the dataset download and rescaling will need to be done, but these are both stored locally inside [data](data), ready for future pipeline runs.
@@ -103,3 +102,7 @@ The pipeline will automatically download and unzip the dataset, as well as downs
 - [Unsupervised Deep Embedding for Clustering Analysis](https://arxiv.org/pdf/1511.06335.pdf)
 - [Kaggle triplet loss](https://www.kaggle.com/code/hirotaka0122/triplet-loss-with-pytorch/notebook)
 - [pytorch dataloader](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+
+# Snap Vision Data Pipeline
+The [miro board](https://miro.com/app/board/uXjVOGzD1U0=/) contains a visual representation of the pipeline and ideas/ ongoing work
+![Alt text](misc/snap-vision-data-pipeline.png?raw=true "Data Pipeline")
